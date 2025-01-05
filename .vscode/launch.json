@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Game",
+            "request": "launch",
+            "mainClass": "jp.ac.uryukyu.ie.e245719.Game",
+            "projectName": "app"
+        },
+        {
+            "type": "java",
+            "name": "Launch Game",
+            "request": "launch",
+            "mainClass": "jp.ac.uryukyu.ie.e245719.Main",
+            "vmArgs": "-XstartOnFirstThread"
+        }
+    ]
+}

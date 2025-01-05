@@ -3,6 +3,14 @@ package jp.ac.uryukyu.ie.e245719;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
 import org.lwjgl.system.MemoryUtil;
 
 public class Game {
@@ -10,6 +18,7 @@ public class Game {
     private World world;
     private Player player;
     private boolean gameStarted = false;
+    private Button startButton;
 
     public void start() {
         init();
@@ -48,9 +57,15 @@ public class Game {
         // OpenGLを初期化
         GL.createCapabilities();
 
+        // 座標系を設定
+        setupOrtho();
+
         // ゲームオブジェクトを初期化
         world = new World();
         player = new Player();
+
+        // スタートボタンを初期化
+        startButton = new Button(350, 250, 100, 50, "Start");
 
         // マウスボタンのコールバックを設定
         GLFW.glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
@@ -61,6 +76,14 @@ public class Game {
                 handleMouseClick(xpos[0], ypos[0]);
             }
         });
+    }
+
+    private void setupOrtho() {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, 800, 0, 600, -1, 1); // 左, 右, 下, 上, 近, 遠
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
     }
 
     private void loop() {
@@ -79,12 +102,22 @@ public class Game {
             // ゲームロジックを更新
             world.update();
             player.update();
+        } else {
+            // マウスカーソルの位置を取得
+            double[] xpos = new double[1];
+            double[] ypos = new double[1];
+            GLFW.glfwGetCursorPos(window, xpos, ypos);
+
+            // Y座標を反転させる
+            ypos[0] = 600 - ypos[0];
+
+            startButton.setHovered(startButton.isClicked(xpos[0], ypos[0]));
         }
     }
 
     private void render() {
         // フレームバッファをクリア
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (gameStarted) {
             // ゲームオブジェクトをレンダリング
@@ -92,28 +125,23 @@ public class Game {
             player.render();
         } else {
             // スタートボタンをレンダリング
-            renderStartButton();
+            startButton.render();
         }
     }
 
-    private void renderStartButton() {
-        // 簡単なボタンをレンダリング（これはプレースホルダーです。実際のレンダリングコードはレンダリングセットアップに依存します）
-        // 例えば、単純な四角形やテクスチャ付きの四角形を使用できます
-        // ここではコンソールにメッセージを表示するだけです
-        System.out.println("Render Start Button");
-    }
-
     private void handleMouseClick(double xpos, double ypos) {
+        // Y座標を反転させる
+        ypos = 600 - ypos;
+
         // クリックがスタートボタンの範囲内にあるかどうかをチェック
-        // これはプレースホルダーです。ボタンの位置とサイズに基づいて座標を調整する必要があります
-        if (xpos >= 350 && xpos <= 450 && ypos >= 250 && ypos <= 350) {
+        if (startButton.isClicked(xpos, ypos)) {
             gameStarted = true;
         }
     }
 
     private void cleanup() {
         // ウィンドウのコールバックを解放し、ウィンドウを破棄
-        GLFW.glfwFreeCallbacks(window);
+        GLFW.glfwSetWindowShouldClose(window, true);
         GLFW.glfwDestroyWindow(window);
 
         // GLFWを終了し、エラーコールバックを解放
