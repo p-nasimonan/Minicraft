@@ -65,8 +65,8 @@ public class Game {
         player = new Player();
 
         // スタートボタンを初期化
-        startButton = new Button(350, 250, 100, 50, "Start");
-
+        startButton = new Button(250, 250, 300, 50, "Start");
+        
         // マウスボタンのコールバックを設定
         GLFW.glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
@@ -111,7 +111,7 @@ public class Game {
             // Y座標を反転させる
             ypos[0] = 600 - ypos[0];
 
-            startButton.setHovered(startButton.isClicked(xpos[0], ypos[0]));
+            startButton.setHovered(startButton.isTouched(xpos[0], ypos[0]));
         }
     }
 
@@ -134,7 +134,7 @@ public class Game {
         ypos = 600 - ypos;
 
         // クリックがスタートボタンの範囲内にあるかどうかをチェック
-        if (startButton.isClicked(xpos, ypos)) {
+        if (startButton.isTouched(xpos, ypos)) {
             gameStarted = true;
         }
     }
