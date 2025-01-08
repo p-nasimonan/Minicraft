@@ -11,7 +11,22 @@ plugins {
 }
 
 val lwjglVersion = "3.3.5"
-val lwjglNatives = "natives-macos-arm64"
+
+// OSに応じてネイティブライブラリを選択
+val lwjglNatives = Pair(
+    System.getProperty("os.name")!!,
+    System.getProperty("os.arch")!!
+).let { (name, arch) ->
+    when {
+        arrayOf("Mac OS X", "Darwin").any { name.startsWith(it) } ->
+            if (arch.startsWith("aarch64")) "natives-macos-arm64"
+            else "natives-macos"
+        arrayOf("Windows").any { name.startsWith(it) } ->
+            if (arch.endsWith("64")) "natives-windows"
+            else "natives-windows"
+        else -> throw Error("Unsupported OS: $name")
+    }
+}
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -40,47 +55,22 @@ dependencies {
     // Add JOML dependency
     implementation("org.joml:joml:1.10.5")
 
-    runtimeOnly("org.lwjgl:lwjgl") {
-        artifact {
-            name = "lwjgl"
-            classifier = lwjglNatives
-        }
-    }
-    runtimeOnly("org.lwjgl:lwjgl-assimp") {
-        artifact {
-            name = "lwjgl-assimp"
-            classifier = lwjglNatives
-        }
-    }
-    runtimeOnly("org.lwjgl:lwjgl-glfw") {
-        artifact {
-            name = "lwjgl-glfw"
-            classifier = lwjglNatives
-        }
-    }
-    runtimeOnly("org.lwjgl:lwjgl-openal") {
-        artifact {
-            name = "lwjgl-openal"
-            classifier = lwjglNatives
-        }
-    }
-    runtimeOnly("org.lwjgl:lwjgl-opengl") {
-        artifact {
-            name = "lwjgl-opengl"
-            classifier = lwjglNatives
-        }
-    }
-    runtimeOnly("org.lwjgl:lwjgl-stb") {
-        artifact {
-            name = "lwjgl-stb"
-            classifier = lwjglNatives
-        }
+    // ネイティブライブラリの依存関係
+    listOf(
+        "lwjgl",
+        "lwjgl-assimp",
+        "lwjgl-glfw",
+        "lwjgl-openal",
+        "lwjgl-opengl",
+        "lwjgl-stb"
+    ).forEach { lib ->
+        runtimeOnly("org.lwjgl:$lib:$lwjglVersion:${lwjglNatives}")
     }
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
