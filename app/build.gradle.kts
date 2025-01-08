@@ -37,6 +37,9 @@ dependencies {
     implementation("org.lwjgl:lwjgl-opengl")
     implementation("org.lwjgl:lwjgl-stb")
 
+    // Add JOML dependency
+    implementation("org.joml:joml:1.10.5")
+
     runtimeOnly("org.lwjgl:lwjgl") {
         artifact {
             name = "lwjgl"
@@ -77,7 +80,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 

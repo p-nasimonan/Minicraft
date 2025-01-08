@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glFrustum;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
@@ -19,6 +20,7 @@ public class Game {
     private Player player;
     private boolean gameStarted = false;
     private Button startButton;
+    private boolean cursorEnabled = true;
 
     public void start() {
         init();
@@ -62,11 +64,14 @@ public class Game {
 
         // ゲームオブジェクトを初期化
         world = new World();
-        player = new Player();
+        player = new Player(window);
 
         // スタートボタンを初期化
-        startButton = new Button(250, 250, 300, 50, "Start");
-        
+        startButton = new Button(350, 250, 100, 50, "Start");
+        interfaceSetup();
+    }
+
+    private void interfaceSetup() {
         // マウスボタンのコールバックを設定
         GLFW.glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
@@ -76,12 +81,41 @@ public class Game {
                 handleMouseClick(xpos[0], ypos[0]);
             }
         });
+
+        // キーボードのコールバックを設定
+        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_PRESS) {
+                if (gameStarted) {
+                    cursorEnabled = !cursorEnabled;
+                    if (cursorEnabled) {
+                        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+                    } else {
+                        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+                        GLFW.glfwSetCursorPos(window, 400, 300);
+                    }
+                }
+            }
+        });
     }
 
     private void setupOrtho() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, 800, 0, 600, -1, 1); // 左, 右, 下, 上, 近, 遠
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+    }
+
+    private void setupCamera() {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        float fov = 45.0f;
+        float aspect = 800.0f / 600.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        float fH = (float) Math.tan(Math.toRadians(fov / 2)) * zNear;
+        float fW = fH * aspect;
+        glFrustum(-fW, fW, -fH, fH, zNear, zFar);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
@@ -101,7 +135,9 @@ public class Game {
         if (gameStarted) {
             // ゲームロジックを更新
             world.update();
-            player.update();
+            if (!cursorEnabled) {
+                player.update(); // カーソルが非表示の時だけプレイヤーの視点を更新
+            }
         } else {
             // マウスカーソルの位置を取得
             double[] xpos = new double[1];
@@ -120,8 +156,13 @@ public class Game {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (gameStarted) {
-            // ゲームオブジェクトをレンダリング
+            // カメラを設定
+            glLoadIdentity();
+            player.setCamera();
+
+            // ワールドをレンダリング
             world.render();
+            // プレイヤーをレンダリング
             player.render();
         } else {
             // スタートボタンをレンダリング
@@ -130,13 +171,32 @@ public class Game {
     }
 
     private void handleMouseClick(double xpos, double ypos) {
-        // Y座標を反転させる
-        ypos = 600 - ypos;
-
-        // クリックがスタートボタンの範囲内にあるかどうかをチェック
-        if (startButton.isTouched(xpos, ypos)) {
-            gameStarted = true;
+        if(gameStarted) {
+            // クリックがプレイヤーのインベントリ内にあるかどうかをチェック
+            //player.checkInventoryClick(xpos, ypos);
+            //return;
         }
+        else {
+            // Y座標を反転させる
+            ypos = 600 - ypos;
+            // クリックがスタートボタンの範囲内にあるかどうかをチェック
+            if (startButton.isTouched(xpos, ypos)) {
+                gamestart();
+
+            }
+        }
+
+
+    }
+
+    private void gamestart() {
+        gameStarted = true;
+        setupCamera();
+        
+        // ゲーム開始時にマウスカーソルを非表示にし、中央に固定
+        cursorEnabled = false;
+        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+        GLFW.glfwSetCursorPos(window, 400, 300);
     }
 
     private void cleanup() {
@@ -149,7 +209,5 @@ public class Game {
         GLFW.glfwSetErrorCallback(null).free();
     }
 
-    public static void main(String[] args) {
-        new Game().start();
-    }
+
 }
