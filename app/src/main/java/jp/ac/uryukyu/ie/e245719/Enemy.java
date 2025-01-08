@@ -19,4 +19,10 @@ public class Enemy extends Mob {
     public void patrol() {
         // パトロールのロジックをここに追加
     }
+
+    @Override
+    public boolean checkCollision(float newX, float newY, float newZ) {
+        // 敵の衝突判定ロジックをここに追加
+        return false;
+    }
 }

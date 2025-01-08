@@ -6,12 +6,15 @@ import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glFrustum;
+import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.system.MemoryUtil;
 
 public class Game {
@@ -64,11 +67,17 @@ public class Game {
 
         // ゲームオブジェクトを初期化
         world = new World();
-        player = new Player(window);
+        player = new Player(window, world);
 
         // スタートボタンを初期化
         startButton = new Button(350, 250, 100, 50, "Start");
         interfaceSetup();
+
+        // ウィンドウリサイズのコールバックを追加
+        GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
+            glViewport(0, 0, width, height);
+            updateProjection(width, height);
+        });
     }
 
     private void interfaceSetup() {
@@ -106,18 +115,35 @@ public class Game {
         glLoadIdentity();
     }
 
-    private void setupCamera() {
+    private void updateProjection(int width, int height) {
+        float aspectRatio = (float) width / height;
+        
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        float fov = 45.0f;
-        float aspect = 800.0f / 600.0f;
-        float zNear = 0.1f;
-        float zFar = 100.0f;
-        float fH = (float) Math.tan(Math.toRadians(fov / 2)) * zNear;
-        float fW = fH * aspect;
-        glFrustum(-fW, fW, -fH, fH, zNear, zFar);
+        
+        if (gameStarted) {
+            // 3Dビュー用の設定
+            float fov = 45.0f;
+            float zNear = 0.1f;
+            float zFar = 100.0f;
+            float fH = (float) Math.tan(Math.toRadians(fov / 2)) * zNear;
+            float fW = fH * aspectRatio;
+            glFrustum(-fW, fW, -fH, fH, zNear, zFar);
+        } else {
+            // 2Dメニュー用の設定
+            float scaleFactor = 600.0f / height;
+            glOrtho(0, width * scaleFactor, 0, 600, -1, 1);
+        }
+        
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
+    }
+
+    private void setupCamera() {
+        int[] width = new int[1];
+        int[] height = new int[1];
+        GLFW.glfwGetFramebufferSize(window, width, height);
+        updateProjection(width[0], height[0]);
     }
 
     private void loop() {
@@ -167,6 +193,12 @@ public class Game {
         } else {
             // スタートボタンをレンダリング
             startButton.render();
+        }
+
+        // OpenGLエラーをチェック
+        int error = glGetError();
+        if (error != GL_NO_ERROR) {
+            System.out.println("OpenGL Error: " + error);
         }
     }
 

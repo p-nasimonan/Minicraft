@@ -1,9 +1,9 @@
 package jp.ac.uryukyu.ie.e245719;
 
-import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.glfw.GLFW;
 import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
@@ -14,27 +14,40 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 public class Player extends Mob {
     private List<Item> inventory;
-    private float x, y, z;
     private float pitch, yaw;
     private Camera camera;
     private MouseInput mouseInput;
     private static final float MOUSE_SENSITIVITY = 0.1f;
     private static final float MOVE_SPEED = 0.1f;
     private final long window;
+    private static final float COLLISION_MARGIN = 0.1f;
+    private World world;
+    private Collider collider;
+    private boolean onGround = false;
+    private String mode;
+    private float verticalVelocity = 0.0f;  // 垂直方向の速度
+    private static final float TERMINAL_VELOCITY = -0.5f;  // 終端速度
 
     /**
      * プレイヤーを初期化します
      * @param windowHandle ウィンドウハンドル
+     * @param world Worldへの参照
      */
-    public Player(long windowHandle) {
+    public Player(long windowHandle, World world) {
         super("player", "Player", 10, 0, 0, 0, 100, 1, 2, 1);
         this.window = windowHandle;
+        this.world = world;
         inventory = new ArrayList<>();
         this.x = 0.0f;
         this.y = 1.8f; // プレイヤーの目の高さ
         this.z = 0.0f;
         this.pitch = 0.0f;
         this.yaw = 0.0f;
+        this.mode = "survival";
+        
+        // プレイヤーのColliderを初期化
+        this.collider = new Collider(x, y, z, 0.6f, 1.8f, 0.6f);
+        
         this.camera = new Camera();
         this.mouseInput = new MouseInput(windowHandle);
         
@@ -49,14 +62,19 @@ public class Player extends Mob {
         mouseInput.input();
         
         // マウスの移動量を取得して回転を更新（X,Y軸を入れ替えて適切な方向に）
-        float deltaYaw = -mouseInput.getDisplVec().x * MOUSE_SENSITIVITY;  // 左右回転
-        float deltaPitch = -mouseInput.getDisplVec().y * MOUSE_SENSITIVITY; // 上下回転
+        float deltaYaw = mouseInput.getDisplVec().x * MOUSE_SENSITIVITY;  // 左右回転
+        float deltaPitch = mouseInput.getDisplVec().y * MOUSE_SENSITIVITY; // 上下回転
         
         // カメラの回転を更新
         rotate(deltaPitch, deltaYaw);
 
+        // 重力の適用
+        applyGravity();
+
         // キーボード入力による移動を処理
         handleMovement();
+
+        debugInfo();
     }
 
     /**
@@ -64,7 +82,7 @@ public class Player extends Mob {
      */
     private void handleMovement() {
         // 移動方向を計算
-        double radYaw = Math.toRadians(yaw);
+        double radYaw = -Math.toRadians(yaw);
         float dx = 0.0f;
         float dz = 0.0f;
 
@@ -90,10 +108,10 @@ public class Player extends Mob {
 
         // ジャンプとしゃがみ
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_SPACE) == GLFW.GLFW_PRESS) {
-            move(0, MOVE_SPEED, 0);
+            jump();
         }
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS) {
-            move(0, -MOVE_SPEED, 0);
+            sneak();
         }
 
         // 実際の移動を適用
@@ -114,10 +132,17 @@ public class Player extends Mob {
     }
 
     public void move(float dx, float dy, float dz) {
-        this.x += dx;
-        this.y += dy;
-        this.z += dz;
-        updateCamera();
+        float newX = this.x + dx;
+        float newY = this.y + dy;
+        float newZ = this.z + dz;
+
+        if (!checkCollision(newX, newY, newZ)) {
+            this.x = newX;
+            this.y = newY;
+            this.z = newZ;
+            collider.setPosition(x, y, z);  // Colliderの位置も更新
+            updateCamera();
+        }
     }
 
     public void rotate(float deltaPitch, float deltaYaw) {
@@ -125,10 +150,10 @@ public class Player extends Mob {
         this.yaw += deltaYaw;
         
         // ピッチ角度を制限（-90度から90度まで）
-        if (this.pitch > 89.0f) {
-            this.pitch = 89.0f;
-        } else if (this.pitch < -89.0f) {
-            this.pitch = -89.0f;
+        if (this.pitch > 90.0f) {
+            this.pitch = 90.0f;
+        } else if (this.pitch < -90.0f) {
+            this.pitch = -90.0f;
         }
         
         // ヨー角度を360度以内に正規化
@@ -155,10 +180,25 @@ public class Player extends Mob {
         return camera;
     }
 
+    @Override
     public void jump() {
-        // ジャンプのロジックをここに追加
+        switch (this.mode) {
+            case "creative":
+                world.gravity(false);
+                move(0, MOVE_SPEED, 0);
+                break;
+            default:
+                if (onGround) {
+                    verticalVelocity = 0.2f;  // ジャンプの初速度
+                    onGround = false;
+                }
+                break;
+        }
     }
 
+    public void sneak() {
+        // しゃがみのロジックをここに追加
+    }
     public void collectItem(Item item) {
         inventory.add(item);
     }
@@ -166,4 +206,54 @@ public class Player extends Mob {
     public void collectBlock(Block block) {
         // ブロックを収集するロジックをここに追加
     }
+
+    @Override
+    public boolean checkCollision(float newX, float newY, float newZ) {
+        collider.setPosition(newX, newY, newZ);
+        boolean collision = false;
+        
+        for (Block block : world.getBlocks()) {
+            if (collider.intersects(block.getCollider())) {
+                System.out.println("Collision detected with block at: (" + 
+                    block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
+                collision = true;
+                break;
+            }
+        }
+        
+        collider.setPosition(x, y, z);
+        return collision;
+    }
+
+    private void applyGravity() {
+        if (!onGround) {
+            verticalVelocity += world.getG();
+            if (verticalVelocity < TERMINAL_VELOCITY) {
+                verticalVelocity = TERMINAL_VELOCITY;
+            }
+            
+            float newY = y + verticalVelocity;
+            
+            if (!checkCollision(x, newY, z)) {
+                y = newY;
+                collider.setPosition(x, y, z);
+                updateCamera();
+            } else {
+                System.out.println("Collision detected while falling");
+                verticalVelocity = 0;
+                onGround = true;
+            }
+        }
+    }
+
+    @Override
+    public void debugInfo() {
+        super.debugInfo();
+        System.out.println("Player Specific Info:");
+        System.out.println("  Mode: " + mode);
+        System.out.println("  OnGround: " + onGround);
+        System.out.println("  Vertical Velocity: " + verticalVelocity);
+        System.out.println("  Camera Rotation: (pitch: " + pitch + ", yaw: " + yaw + ")");
+    }
+
 }

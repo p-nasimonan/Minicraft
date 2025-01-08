@@ -3,63 +3,63 @@ package jp.ac.uryukyu.ie.e245719;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.GL_LINES;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-
 public class World {
     private List<Block> blocks;
     private List<Enemy> enemies;
+    // GameObjectのリストを作成し、全てのオブジェクトを更新
+    private List<GameObject> gameObjects = new ArrayList<>();
+    private static float g = -0.01f;
 
     public World() {
         blocks = new ArrayList<>();
         enemies = new ArrayList<>();
+        gameObjects = new ArrayList<>();
         generate();
     }
 
     public void generate() {
         // ワールドの生成ロジックをここに追加
-        // 例: ブロックや敵をリストに追加
+        // 地面を石ブロックとして追加
+        for (int x = -10; x < 10; x++) {
+            for (int z = -10; z < 10; z++) {
+                Block block = new Block("stone", x * 1, -4, z * 1, 1, 1, 1);
+                blocks.add(block);
+                gameObjects.add(block);
+            }
+        } 
+        // 必要に応じて他のブロックも追加
     }
 
+    /**
+     * ワールドの更新ロジックを実行します。
+     * 敵、プレイヤー、ブロックの状態を一括で更新します。
+     */
     public void update() {
-        // ワールドの更新ロジックをここに追加
-        for (Enemy enemy : enemies) {
-            enemy.update();
+        for (GameObject gameObject : gameObjects) {
+            gameObject.update();
         }
     }
 
     public void render() {
-        // 地面の描画
-        glColor3f(0.2f, 0.6f, 0.2f); // 緑色
-        glBegin(GL_QUADS);
-        float size = 100.0f;  // 地面のサイズ
-        glVertex3f(-size, -0.5f, -size);
-        glVertex3f(size, -0.5f, -size);
-        glVertex3f(size, -0.5f, size);
-        glVertex3f(-size, -0.5f, size);
-        glEnd();
+        for (GameObject gameObject : gameObjects) {
+            gameObject.render();
+        }
+    }
 
-        // グリッドの描画（オプション）
-        glColor3f(0.3f, 0.3f, 0.3f);
-        glBegin(GL_LINES);
-        for (float i = -size; i <= size; i += 2.0f) {
-            glVertex3f(i, -0.5f, -size);
-            glVertex3f(i, -0.5f, size);
-            glVertex3f(-size, -0.5f, i);
-            glVertex3f(size, -0.5f, i);
-        }
-        glEnd();
+    // ブロックリストへのアクセサを追加
+    public List<Block> getBlocks() {
+        return blocks;
+    }
 
-        // 既存のブロックと敵の描画
-        for (Block block : blocks) {
-            block.render();
+    public void gravity(boolean isGrounded) {
+        if (!isGrounded) {
+            g = -0.01f;
+        } else {
+            g = 0;
         }
-        for (Enemy enemy : enemies) {
-            enemy.render();
-        }
+    }
+
+    public float getG() {
+        return g;
     }
 }

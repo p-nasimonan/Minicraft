@@ -1,19 +1,52 @@
 package jp.ac.uryukyu.ie.e245719;
 
-public class Block extends  Item {
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+
+public class Block extends Item {
     private String type;
     private Collider collider;
 
-    public Block(String type, int x, int y, int z, int width, int height, int depth) {
+    public Block(String type, float x, float y, float z, float width, float height, float depth) {
+        super("block", type, x, y, z, width, height, depth);
         this.type = type;
         this.collider = new Collider(x, y, z, width, height, depth);
     }
 
+    @Override
     public void render() {
-        // レンダリング処理
+        // デプスバッファを有効化
+        glEnable(GL_DEPTH_TEST);
+        
+        // ブロックの色を設定
+        if (type.equals("stone")) {
+            glColor3f(0.5f, 0.5f, 0.5f); // 灰色
+        } else {
+            glColor3f(1.0f, 1.0f, 1.0f); // デフォルトの色
+        }
+
+        // 面を描画
+        glBegin(GL_QUADS);
+        drawFace("front");
+        drawFace("back");
+        drawFace("left");
+        drawFace("right");
+        drawFace("top");
+        drawFace("bottom");
+        glEnd();
+
+        // 辺を描画
+        drawEdges();
+        
     }
 
-    public boolean checkCollision(Collider other) {
-        return collider.intersects(other);
+    @Override
+    public boolean checkCollision(float newX, float newY, float newZ) {
+        return collider.intersects(new Collider(newX, newY, newZ, 1, 1, 1));
     }
+    
 }
