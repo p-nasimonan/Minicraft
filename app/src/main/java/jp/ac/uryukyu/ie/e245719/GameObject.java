@@ -54,6 +54,9 @@ public abstract class GameObject {
     public float getX() { return x; }
     public float getY() { return y; }
     public float getZ() { return z; }
+    public float getWidth() { return width; }
+    public float getHeight() { return height; }
+    public float getDepth() { return depth; }
 
     /**
      * オブジェクトの状態をデバッグ出力します
@@ -215,7 +218,6 @@ public abstract class GameObject {
      * 衝突が発生した場合、垂直速度をリセットし、地面に接触している状態にします。
      */
     public void applyGravity() {
-        System.out.println(onGround);
         if (!onGround) {
             vy += world.getG();
             if (vy < TERMINAL_VELOCITY) {
@@ -231,6 +233,13 @@ public abstract class GameObject {
                 System.out.printf("Collision detected while falling at position (%.2f, %.2f, %.2f) with vertical velocity %.2f%n", x, newY, z, vy);
                 vy = 0;
                 onGround = true;
+            }
+        }
+        else {
+            vy += world.getG();
+            float newY = y + vy;
+            if(!checkCollision(x, newY, z)){
+                onGround = false;
             }
         }
     }
