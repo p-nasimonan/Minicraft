@@ -5,7 +5,7 @@ package jp.ac.uryukyu.ie.e245719;
  */
 public class Collider {
     private float x, y, z;
-    private float width, height, depth;
+    private final float width, height, depth;
 
     /**
      * Colliderを初期化します

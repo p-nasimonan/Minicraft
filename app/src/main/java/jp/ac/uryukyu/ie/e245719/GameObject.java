@@ -12,7 +12,14 @@ public abstract class GameObject {
     protected float x;
     protected float y;
     protected float z;
-    protected Collider collider;
+    protected final float width;
+    protected final float height;
+    protected final float depth;
+    protected  Collider collider;
+    protected  World world;
+    protected boolean onGround = false;
+    protected float vy = 0.0f;
+    protected static final float TERMINAL_VELOCITY = -0.5f;
 
     public GameObject(String name, String type, float x, float y, float z, float width, float height, float depth) {
         this.name = name;
@@ -20,8 +27,12 @@ public abstract class GameObject {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
         this.collider = new Collider(x, y, z, width, height, depth);
     }
+
 
     public abstract void update();
     public abstract void render();
@@ -48,14 +59,18 @@ public abstract class GameObject {
      * オブジェクトの状態をデバッグ出力します
      */
     public void debugInfo() {
-        System.out.println("=== " + name + " Debug Info ===");
-        System.out.println("Type: " + type);
-        System.out.println("Position: (" + x + ", " + y + ", " + z + ")");
-        if (collider != null) {
-            System.out.println("Collider: " + 
-                "\n  Position: (" + collider.getX() + ", " + collider.getY() + ", " + collider.getZ() + ")" +
-                "\n  Size: (" + collider.getWidth() + ", " + collider.getHeight() + ", " + collider.getDepth() + ")");
-        }
+        System.out.println("""
+            === %s Debug Info ===
+            Type: %s
+            Position: (%.2f, %.2f, %.2f)
+            Collider: 
+              Position: (%.2f, %.2f, %.2f)
+              Size: (%.2f, %.2f, %.2f)
+            """.formatted(
+                name, type, x, y, z,
+                collider.getX(), collider.getY(), collider.getZ(),
+                collider.getWidth(), collider.getHeight(), collider.getDepth()
+            ));
     }
 
     /**
@@ -79,53 +94,70 @@ public abstract class GameObject {
      * @param newZ 新しいZ座標
      * @return 衝突する場合はtrue
      */
-    public abstract boolean checkCollision(float newX, float newY, float newZ);
+    public boolean checkCollision(float newX, float newY, float newZ) {
+        collider.setPosition(newX, newY, newZ);
+        boolean collision = false;
+        
+        for (Block block : world.getBlocks()) {
+            if (collider.intersects(block.getCollider())) {
+                System.out.println("Collision detected with block at: (" + 
+                    block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
+                collision = true;
+                // 下方向への移動で衝突した場合、地面に着地したとみなす
+                if (newY < y) {
+                    onGround = true;
+                }
+                break;
+            }
+        }
+        
+        // 衝突がない場合は空中にいる
+        if (!collision && newY < y) {
+            onGround = false;
+        }
+        
+        collider.setPosition(x, y, z);
+        return collision;
+    }
 
     public void drawFace(String face) {
-        float x = collider.getX();
-        float y = collider.getY();
-        float z = collider.getZ();
-        float width = collider.getWidth();
-        float height = collider.getHeight();
-        float depth = collider.getDepth();
-
         switch (face) {
-            case "front":
+            case "front" -> {
                 glVertex3f(x, y, z);
                 glVertex3f(x + width, y, z);
                 glVertex3f(x + width, y + height, z);
                 glVertex3f(x, y + height, z);
-                break;
-            case "back":
+            }
+            case "back" -> {
                 glVertex3f(x, y, z + depth);
                 glVertex3f(x + width, y, z + depth);
                 glVertex3f(x + width, y + height, z + depth);
                 glVertex3f(x, y + height, z + depth);
-                break;
-            case "left":
+            }
+            case "left" -> {
                 glVertex3f(x, y, z);
                 glVertex3f(x, y, z + depth);
                 glVertex3f(x, y + height, z + depth);
                 glVertex3f(x, y + height, z);
-                break;
-            case "right":
+            }
+            case "right" -> {
                 glVertex3f(x + width, y, z);
                 glVertex3f(x + width, y, z + depth);
                 glVertex3f(x + width, y + height, z + depth);
                 glVertex3f(x + width, y + height, z);
-                break;
-            case "top":
+            }
+            case "top" -> {
                 glVertex3f(x, y + height, z);
                 glVertex3f(x + width, y + height, z);
                 glVertex3f(x + width, y + height, z + depth);
                 glVertex3f(x, y + height, z + depth);
-                break;
-            case "bottom":
+            }
+            case "bottom" -> {
                 glVertex3f(x, y, z);
                 glVertex3f(x + width, y, z);
                 glVertex3f(x + width, y, z + depth);
                 glVertex3f(x, y, z + depth);
-                break;
+            }
         }
     }
 
@@ -136,14 +168,14 @@ public abstract class GameObject {
         // 辺の描画
         // 各辺の始点と終点を定義
         float[][] vertices = {
-            {collider.getX(), collider.getY(), collider.getZ()}, // 前面の左下
-            {collider.getX() + collider.getWidth(), collider.getY(), collider.getZ()}, // 前面の右下
-            {collider.getX() + collider.getWidth(), collider.getY(), collider.getZ() + collider.getDepth()}, // 背面の右下
-            {collider.getX(), collider.getY(), collider.getZ() + collider.getDepth()}, // 背面の左下
-            {collider.getX(), collider.getY() + collider.getHeight(), collider.getZ()}, // 前面の左上
-            {collider.getX() + collider.getWidth(), collider.getY() + collider.getHeight(), collider.getZ()}, // 前面の右上
-            {collider.getX() + collider.getWidth(), collider.getY() + collider.getHeight(), collider.getZ() + collider.getDepth()}, // 背面の右上
-            {collider.getX(), collider.getY() + collider.getHeight(), collider.getZ() + collider.getDepth()}, // 背面の左上
+            {x, y, z}, // 前面の左下
+            {x + width, y, z}, // 前面の右下
+            {x + width, y, z + depth}, // 背面の右下
+            {x, y, z + depth}, // 背面の左下
+            {x, y + height, z}, // 前面の左上
+            {x + width, y + height, z}, // 前面の右上
+            {x + width, y + height, z + depth}, // 背面の右上
+            {x, y + height, z + depth}, // 背面の左上
         };
 
         // 各辺を描画
@@ -175,4 +207,32 @@ public abstract class GameObject {
         glVertex3f(start[0], start[1], start[2]);
         glVertex3f(end[0], end[1], end[2]);
     }
+
+    /**
+     * 重力を適用します。
+     * オブジェクトが地面に接触していない場合、垂直速度を更新し、
+     * 新しいY座標を計算して衝突判定を行います。
+     * 衝突が発生した場合、垂直速度をリセットし、地面に接触している状態にします。
+     */
+    public void applyGravity() {
+        System.out.println(onGround);
+        if (!onGround) {
+            vy += world.getG();
+            if (vy < TERMINAL_VELOCITY) {
+                vy = TERMINAL_VELOCITY;
+            }
+            
+            float newY = y + vy;
+            
+            if (!checkCollision(x, newY, z)) {
+                y = newY;
+                collider.setPosition(x, y, z);
+            } else {
+                System.out.printf("Collision detected while falling at position (%.2f, %.2f, %.2f) with vertical velocity %.2f%n", x, newY, z, vy);
+                vy = 0;
+                onGround = true;
+            }
+        }
+    }
+
 }

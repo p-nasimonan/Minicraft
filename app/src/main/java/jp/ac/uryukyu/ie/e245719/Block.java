@@ -8,9 +8,6 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 
 public class Block extends Item {
-    private String type;
-    private Collider collider;
-
     public Block(String type, float x, float y, float z, float width, float height, float depth) {
         super("block", type, x, y, z, width, height, depth);
         this.type = type;

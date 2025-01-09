@@ -10,10 +10,10 @@ import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 public class MouseInput {
 
     private Vector2f currentPos;
-    private Vector2f displVec;
+    private final Vector2f displVec;
     private boolean inWindow;
     private boolean leftButtonPressed;
-    private Vector2f previousPos;
+    private final Vector2f previousPos;
     private boolean rightButtonPressed;
 
     public MouseInput(long windowHandle) {

@@ -20,13 +20,7 @@ public class Player extends Mob {
     private static final float MOUSE_SENSITIVITY = 0.1f;
     private static final float MOVE_SPEED = 0.1f;
     private final long window;
-    private static final float COLLISION_MARGIN = 0.1f;
-    private World world;
-    private Collider collider;
-    private boolean onGround = false;
     private String mode;
-    private float verticalVelocity = 0.0f;  // 垂直方向の速度
-    private static final float TERMINAL_VELOCITY = -0.5f;  // 終端速度
 
     /**
      * プレイヤーを初期化します
@@ -39,14 +33,14 @@ public class Player extends Mob {
         this.world = world;
         inventory = new ArrayList<>();
         this.x = 0.0f;
-        this.y = 1.8f; // プレイヤーの目の高さ
+        this.y = 2.0f; // プレイヤーの目の高さ
         this.z = 0.0f;
         this.pitch = 0.0f;
         this.yaw = 0.0f;
         this.mode = "survival";
         
         // プレイヤーのColliderを初期化
-        this.collider = new Collider(x, y, z, 0.6f, 1.8f, 0.6f);
+        this.collider = new Collider(x, y, z, 0.6f, 2.0f, 0.6f);
         
         this.camera = new Camera();
         this.mouseInput = new MouseInput(windowHandle);
@@ -75,6 +69,8 @@ public class Player extends Mob {
         handleMovement();
 
         debugInfo();
+
+        updateCamera();
     }
 
     /**
@@ -140,9 +136,9 @@ public class Player extends Mob {
             this.x = newX;
             this.y = newY;
             this.z = newZ;
-            collider.setPosition(x, y, z);  // Colliderの位置も更新
-            updateCamera();
+
         }
+        collider.setPosition(x, y, z);  // Colliderの位置も更新
     }
 
     public void rotate(float deltaPitch, float deltaYaw) {
@@ -164,7 +160,6 @@ public class Player extends Mob {
             this.yaw += 360.0f;
         }
         
-        updateCamera();
     }
 
     private void updateCamera() {
@@ -189,7 +184,7 @@ public class Player extends Mob {
                 break;
             default:
                 if (onGround) {
-                    verticalVelocity = 0.2f;  // ジャンプの初速度
+                    vy = 0.2f;  // ジャンプの初速度
                     onGround = false;
                 }
                 break;
@@ -207,44 +202,7 @@ public class Player extends Mob {
         // ブロックを収集するロジックをここに追加
     }
 
-    @Override
-    public boolean checkCollision(float newX, float newY, float newZ) {
-        collider.setPosition(newX, newY, newZ);
-        boolean collision = false;
-        
-        for (Block block : world.getBlocks()) {
-            if (collider.intersects(block.getCollider())) {
-                System.out.println("Collision detected with block at: (" + 
-                    block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
-                collision = true;
-                break;
-            }
-        }
-        
-        collider.setPosition(x, y, z);
-        return collision;
-    }
 
-    private void applyGravity() {
-        if (!onGround) {
-            verticalVelocity += world.getG();
-            if (verticalVelocity < TERMINAL_VELOCITY) {
-                verticalVelocity = TERMINAL_VELOCITY;
-            }
-            
-            float newY = y + verticalVelocity;
-            
-            if (!checkCollision(x, newY, z)) {
-                y = newY;
-                collider.setPosition(x, y, z);
-                updateCamera();
-            } else {
-                System.out.println("Collision detected while falling");
-                verticalVelocity = 0;
-                onGround = true;
-            }
-        }
-    }
 
     @Override
     public void debugInfo() {
@@ -252,7 +210,7 @@ public class Player extends Mob {
         System.out.println("Player Specific Info:");
         System.out.println("  Mode: " + mode);
         System.out.println("  OnGround: " + onGround);
-        System.out.println("  Vertical Velocity: " + verticalVelocity);
+        System.out.println("  Vertical Velocity: " + vy);
         System.out.println("  Camera Rotation: (pitch: " + pitch + ", yaw: " + yaw + ")");
     }
 

@@ -3,7 +3,6 @@ package jp.ac.uryukyu.ie.e245719;
 public abstract class Mob extends GameObject {
     protected int attack;
     protected int hp;
-    private Collider collider;
 
     public Mob(String id, String name, int attack, float x, float y, float z, int hp, float width, float height, float depth) {
         super(id, name, x, y, z, width, height, depth);
@@ -18,6 +17,10 @@ public abstract class Mob extends GameObject {
 
     public void jump() {
         // ジャンプ処理
+        if (onGround) {
+            vy = 0.2f;  // ジャンプの初速度
+            onGround = false;
+        }
     }
 
     public void attack() {
@@ -28,7 +31,6 @@ public abstract class Mob extends GameObject {
         // 被ダメージ処理
     }
 
-    public boolean checkCollision(Collider other) {
-        return collider.intersects(other);
-    }
+
+    
 }

@@ -3,6 +3,9 @@ package jp.ac.uryukyu.ie.e245719;
 public class Item extends GameObject {
     public Item(String name, String type, float x, float y, float z, float width, float height, float depth) {
         super(name, type, x, y, z, width, height, depth);
+        this.name = name;
+        this.type = type;
+        this.collider = new Collider(x, y, z, width, height, depth);
     }
 
     @Override

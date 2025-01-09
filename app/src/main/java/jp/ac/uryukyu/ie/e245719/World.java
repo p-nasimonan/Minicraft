@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class World {
-    private List<Block> blocks;
-    private List<Enemy> enemies;
+    private final List<Block> blocks;
+    private final List<Enemy> enemies;
     // GameObjectのリストを作成し、全てのオブジェクトを更新
     private List<GameObject> gameObjects = new ArrayList<>();
     private static float g = -0.01f;
@@ -17,7 +17,7 @@ public class World {
         generate();
     }
 
-    public void generate() {
+    public final void generate() {
         // ワールドの生成ロジックをここに追加
         // 地面を石ブロックとして追加
         for (int x = -10; x < 10; x++) {
@@ -49,6 +49,15 @@ public class World {
     // ブロックリストへのアクセサを追加
     public List<Block> getBlocks() {
         return blocks;
+    }
+    public void addBlock(Block block) {
+        blocks.add(block);
+    }
+    public List<GameObject> getGameObjects() {
+        return gameObjects;
+    }
+    public List<Enemy> getEnemies() {
+        return enemies;
     }
 
     public void gravity(boolean isGrounded) {
