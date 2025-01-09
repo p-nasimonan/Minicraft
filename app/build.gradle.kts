@@ -66,6 +66,8 @@ dependencies {
     ).forEach { lib ->
         runtimeOnly("org.lwjgl:$lib:$lwjglVersion:${lwjglNatives}")
     }
+
+    testImplementation("org.assertj:assertj-core:3.24.2")
 }
 
 java {
