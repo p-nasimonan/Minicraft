@@ -31,6 +31,10 @@ public abstract class Mob extends GameObject {
         // 被ダメージ処理
     }
 
+    public int getHp() {
+        return hp;
+    }
+
 
     
 }

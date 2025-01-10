@@ -37,7 +37,7 @@ public class Game {
         cleanup();
     }
 
-    private long createWindow() {
+    public long createWindow() {
         // スレッドチェックを追加
         if (!Thread.currentThread().getName().equals("main")) {
             throw new IllegalStateException("GLFWはメインスレッドでのみ使用できます。JVMを-XstartOnFirstThreadで起動してください。");
@@ -278,7 +278,7 @@ public class Game {
         GLFW.glfwSetCursorPos(mainWindow, 400, 300);
     }
 
-    private void cleanup() {
+    public void cleanup() {
         // ウィンドウのコールバックを解放し、ウィンドウを破棄
         GLFW.glfwSetWindowShouldClose(mainWindow, true);
         GLFW.glfwDestroyWindow(mainWindow);

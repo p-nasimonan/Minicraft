@@ -1,6 +1,7 @@
 package jp.ac.uryukyu.ie.e245719;
 
 import org.junit.jupiter.api.Test;
+import org.lwjgl.glfw.GLFW;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest extends TestBase {
