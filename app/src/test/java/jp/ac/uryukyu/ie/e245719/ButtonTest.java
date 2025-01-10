@@ -24,4 +24,5 @@ class ButtonTest extends TestBase {
         assertTrue(button.isTouched(150, 125));  // ボタンの中心付近
         assertFalse(button.isTouched(0, 0));    // ボタンの外
     }
+
 }

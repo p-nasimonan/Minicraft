@@ -15,16 +15,17 @@ class TestMob extends Mob {
     public void render() {}
 }
 
-class MobTest {
+class MobTest extends TestBase {
 
     @Test
-    void testMobInitialization() {
+    void モブが正しく初期化される() {
         TestMob mob = new TestMob("testMob", "mob1", 10, 0, 0, 0, 100, 1, 1, 1);
         assertEquals("testMob", mob.getName());
+        assertEquals(100, mob.getHp());
     }
 
     @Test
-    void testMobJump() {
+    void ジャンプ処理が正しく機能する() {
         TestMob mob = new TestMob("testMob", "mob1", 10, 0, 0, 0, 100, 1, 1, 1);
         mob.jump();
         assertNotEquals(0, mob.vy);

@@ -4,6 +4,17 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class TestGameObject extends GameObject {
+    /**
+     * テスト用のGameObjectを初期化します。
+     * @param name オブジェクトの名前
+     * @param type オブジェクトのタイプ
+     * @param x x座標
+     * @param y y座標
+     * @param z z座標
+     * @param width 幅
+     * @param height 高さ
+     * @param depth 奥行き
+     */
     public TestGameObject(String name, String type, float x, float y, float z, float width, float height, float depth) {
         super(name, type, x, y, z, width, height, depth);
     }
@@ -22,7 +33,7 @@ class TestGameObject extends GameObject {
 public class GameObjectTest {
 
     @Test
-    public void testInit() {
+    public void 初期化テスト() {
         TestGameObject testObject = new TestGameObject("test", "test", 0, 0, 0, 1, 1, 1);
         
         Assertions.assertThat(testObject)
@@ -39,7 +50,7 @@ public class GameObjectTest {
     }
 
     @Test
-    public void testGetCollider() {
+    public void コライダー取得テスト() {
         TestGameObject testObject = new TestGameObject("test", "test", 0, 0, 0, 1, 1, 1);
         Collider collider = testObject.getCollider();
         
@@ -55,30 +66,30 @@ public class GameObjectTest {
     }
 
     @Test
-    public void testCollisionDetection() {
+    public void 衝突検出テスト() {
         TestGameObject obj1 = new TestGameObject("obj1", "test", 0, 0, 0, 1, 1, 1);
         TestGameObject obj2 = new TestGameObject("obj2", "test", 0.5f, 0, 0, 1, 1, 1);
         
         Assertions.assertThat(obj1.getCollider().intersects(obj2.getCollider()))
-            .as("Overlapping objects should detect collision")
+            .as("重なっているオブジェクトは衝突を検出するべきです")
             .isTrue();
         
         TestGameObject obj3 = new TestGameObject("obj3", "test", 2, 0, 0, 1, 1, 1);
         
         Assertions.assertThat(obj1.getCollider().intersects(obj3.getCollider()))
-            .as("Non-overlapping objects should not detect collision")
+            .as("重なっていないオブジェクトは衝突を検出しないべきです")
             .isFalse();
     }
 
     @Test
-    public void testDebugInfo() {
+    public void デバッグ情報テスト() {
         TestGameObject testObject = new TestGameObject("test", "test", 1, 2, 3, 1, 1, 1);
         String collisionInfo = testObject.checkCollisionInfo(
             new TestGameObject("other", "test", 5, 5, 5, 1, 1, 1)
         );
         
         Assertions.assertThat(collisionInfo)
-            .as("Collision info should contain object names and collision status")
+            .as("衝突情報にはオブジェクト名と衝突状態が含まれるべきです")
             .contains("test")
             .contains("other")
             .contains("NO");
