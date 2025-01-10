@@ -7,7 +7,7 @@
             "name": "Launch Game",
             "request": "launch",
             "mainClass": "jp.ac.uryukyu.ie.e245719.Main",
-            "vmArgs": "-XstartOnFirstThread"
+
         },
         {
             "type": "java",

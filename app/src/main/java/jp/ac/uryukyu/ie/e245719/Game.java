@@ -26,6 +26,9 @@ public class Game {
     private boolean cursorEnabled = true;
     private InterFace interFace;
     private boolean cursorToggleInProgress = false; // カーソル切り替え中フラグ
+    private long lastFpsTime;  // 前回のFPS計測時刻
+    private int fps;          // 現在のFPS
+    private int frames;       // フレームカウンター
 
     public void start() {
         this.mainWindow = createWindow();
@@ -34,7 +37,7 @@ public class Game {
         cleanup();
     }
 
-    public long createWindow() {
+    private long createWindow() {
         // スレッドチェックを追加
         if (!Thread.currentThread().getName().equals("main")) {
             throw new IllegalStateException("GLFWはメインスレッドでのみ使用できます。JVMを-XstartOnFirstThreadで起動してください。");
@@ -85,13 +88,18 @@ public class Game {
     private void gameInit() {
         // ゲームオブジェクトを初期化
         this.world = new World();
-        this.player = new Player(mainWindow, world);
+        this.player = new Player(mainWindow, world, 0, 2, 0);
 
         // スタートボタンを初期化
         this.startButton = new Button(350, 250, 100, 50, "Start");
 
         // インターフェースを初期化
         this.interFace = new InterFace(mainWindow);
+
+        // FPS計測の初期化
+        lastFpsTime = System.currentTimeMillis();
+        fps = 0;
+        frames = 0;
     }
 
     private void setupOrtho() {
@@ -134,12 +142,41 @@ public class Game {
     }
 
     private void loop() {
-        // ユーザーがウィンドウを閉じようとするまでレンダリングループを実行
+        // ゲームループのタイミング制御用
+        double secsPerUpdate = 1.0 / 60.0;
+        double previous = System.currentTimeMillis() / 1000.0;
+        double steps = 0.0;
+        
         while (!GLFW.glfwWindowShouldClose(mainWindow)) {
-            update();
+            double current = System.currentTimeMillis() / 1000.0;
+            double elapsed = current - previous;
+            previous = current;
+            steps += elapsed;
+
+            // FPS計測
+            frames++;
+            if (System.currentTimeMillis() - lastFpsTime > 1000) {
+                fps = frames;
+                frames = 0;
+                lastFpsTime = System.currentTimeMillis();
+                // FPSをコンソールに出力（デバッグ用）
+                System.out.println("FPS: " + fps);
+            }
+
+            // 入力処理
+            handleInput();
+
+            // 固定時間ステップでの更新
+            while (steps >= secsPerUpdate) {
+                update();
+                steps -= secsPerUpdate;
+            }
+
+            // 描画
             render();
 
-            GLFW.glfwSwapBuffers(mainWindow); // カラーバッファを交換
+            // バッファの入れ替えとイベント処理
+            GLFW.glfwSwapBuffers(mainWindow);
             GLFW.glfwPollEvents();
         }
     }

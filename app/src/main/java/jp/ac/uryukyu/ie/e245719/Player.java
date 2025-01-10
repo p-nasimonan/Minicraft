@@ -28,8 +28,8 @@ public class Player extends Mob {
      * @param windowHandle ウィンドウハンドル
      * @param world Worldへの参照
      */
-    public Player(long windowHandle, World world) {
-        super("player", "Player", 10, 0, 0, 0, 100, 1, 2, 1);
+    public Player(long windowHandle, World world, float x, float y, float z) {
+        super("player", "Player", 10, x, y, z, 100, 1, 2, 1);
         this.window = windowHandle;
         this.world = world;
         inventory = new ArrayList<>();

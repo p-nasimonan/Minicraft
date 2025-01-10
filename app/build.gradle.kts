@@ -8,6 +8,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    kotlin("jvm") version "1.8.0"
 }
 
 val lwjglVersion = "3.3.5"
@@ -24,6 +25,9 @@ val lwjglNatives = Pair(
         arrayOf("Windows").any { name.startsWith(it) } ->
             if (arch.endsWith("64")) "natives-windows"
             else "natives-windows"
+        arrayOf("Linux").any { name.startsWith(it) } ->
+            if (arch.endsWith("64")) "natives-linux"
+            else "natives-linux"
         else -> throw Error("Unsupported OS: $name")
     }
 }
@@ -75,8 +79,10 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(23))
     }
+    sourceCompatibility = JavaVersion.VERSION_23
+    targetCompatibility = JavaVersion.VERSION_23
 }
 
 application {
@@ -87,4 +93,14 @@ application {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8" // エンコーディングをUTF-8に設定
+}
+
+tasks.test {
+    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+        jvmArgs = listOf("-XstartOnFirstThread")
+    }
 }
