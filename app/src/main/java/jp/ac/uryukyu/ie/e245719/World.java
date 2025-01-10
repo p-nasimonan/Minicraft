@@ -8,7 +8,7 @@ public class World {
     private final List<Enemy> enemies;
     // GameObjectのリストを作成し、全てのオブジェクトを更新
     private List<GameObject> gameObjects = new ArrayList<>();
-    private static float g = -0.01f;
+    private final static float G = -0.007f;
 
     public World() {
         blocks = new ArrayList<>();
@@ -22,7 +22,7 @@ public class World {
         // 地面を石ブロックとして追加
         for (int x = -10; x < 10; x++) {
             for (int z = -10; z < 10; z++) {
-                Block block = new Block("stone", x * 1, -4, z * 1, 1, 1, 1);
+                Block block = new Block("石ブロック", "stone", x * 1, -4, z * 1, 1, 1, 1);
                 blocks.add(block);
                 gameObjects.add(block);
             }
@@ -60,15 +60,8 @@ public class World {
         return enemies;
     }
 
-    public void gravity(boolean isGrounded) {
-        if (!isGrounded) {
-            g = -0.01f;
-        } else {
-            g = 0;
-        }
-    }
 
     public float getG() {
-        return g;
+        return G;
     }
 }

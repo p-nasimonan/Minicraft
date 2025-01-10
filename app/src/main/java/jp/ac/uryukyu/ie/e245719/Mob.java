@@ -4,8 +4,8 @@ public abstract class Mob extends GameObject {
     protected int attack;
     protected int hp;
 
-    public Mob(String id, String name, int attack, float x, float y, float z, int hp, float width, float height, float depth) {
-        super(id, name, x, y, z, width, height, depth);
+    public Mob(String name, String id,  int attack, float x, float y, float z, int hp, float width, float height, float depth) {
+        super(name, id, x, y, z, width, height, depth);
         this.attack = attack;
         this.hp = hp;
         this.collider = new Collider(x, y, z, width, height, depth);

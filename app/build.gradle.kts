@@ -35,9 +35,10 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
+    // JUnit Jupiterをテスト用に使用
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 
+    // JUnitプラットフォームランチャーをテストランタイム用に使用
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // This dependency is used by the application.
@@ -68,6 +69,8 @@ dependencies {
     }
 
     testImplementation("org.assertj:assertj-core:3.24.2")
+
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
 java {

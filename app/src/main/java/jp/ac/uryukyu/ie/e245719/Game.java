@@ -18,20 +18,28 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.system.MemoryUtil;
 
 public class Game {
-    private long window;
+    private long mainWindow;
     private World world;
     private Player player;
     private boolean gameStarted = false;
     private Button startButton;
     private boolean cursorEnabled = true;
+    private InterFace interFace;
+    private boolean cursorToggleInProgress = false; // カーソル切り替え中フラグ
 
     public void start() {
-        init();
+        this.mainWindow = createWindow();
+        gameInit();
         loop();
         cleanup();
     }
 
-    private void init() {
+    public long createWindow() {
+        // スレッドチェックを追加
+        if (!Thread.currentThread().getName().equals("main")) {
+            throw new IllegalStateException("GLFWはメインスレッドでのみ使用できます。JVMを-XstartOnFirstThreadで起動してください。");
+        }
+        long win;
         // エラーコールバックを設定
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -46,18 +54,18 @@ public class Game {
         GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
         // ウィンドウを作成
-        window = GLFW.glfwCreateWindow(800, 600, "Minicraft", MemoryUtil.NULL, MemoryUtil.NULL);
-        if (window == MemoryUtil.NULL) {
+        win = GLFW.glfwCreateWindow(800, 600, "Minicraft", MemoryUtil.NULL, MemoryUtil.NULL);
+        if (win == MemoryUtil.NULL) {
             throw new RuntimeException("GLFWウィンドウの作成に失敗しました");
         }
 
         // OpenGLコンテキストを現在のものにする
-        GLFW.glfwMakeContextCurrent(window);
+        GLFW.glfwMakeContextCurrent(win);
         // 垂直同期を有効にする
         GLFW.glfwSwapInterval(1);
 
         // ウィンドウを表示
-        GLFW.glfwShowWindow(window);
+        GLFW.glfwShowWindow(win);
 
         // OpenGLを初期化
         GL.createCapabilities();
@@ -65,46 +73,25 @@ public class Game {
         // 座標系を設定
         setupOrtho();
 
-        // ゲームオブジェクトを初期化
-        world = new World();
-        player = new Player(window, world);
-
-        // スタートボタンを初期化
-        startButton = new Button(350, 250, 100, 50, "Start");
-        interfaceSetup();
-
         // ウィンドウリサイズのコールバックを追加
-        GLFW.glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
+        GLFW.glfwSetFramebufferSizeCallback(win, (window, width, height) -> {
             glViewport(0, 0, width, height);
             updateProjection(width, height);
         });
+
+        return win;
     }
 
-    private void interfaceSetup() {
-        // マウスボタンのコールバックを設定
-        GLFW.glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
-                double[] xpos = new double[1];
-                double[] ypos = new double[1];
-                GLFW.glfwGetCursorPos(window, xpos, ypos);
-                handleMouseClick(xpos[0], ypos[0]);
-            }
-        });
+    private void gameInit() {
+        // ゲームオブジェクトを初期化
+        this.world = new World();
+        this.player = new Player(mainWindow, world);
 
-        // キーボードのコールバックを設定
-        GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if (key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_PRESS) {
-                if (gameStarted) {
-                    cursorEnabled = !cursorEnabled;
-                    if (cursorEnabled) {
-                        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
-                    } else {
-                        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
-                        GLFW.glfwSetCursorPos(window, 400, 300);
-                    }
-                }
-            }
-        });
+        // スタートボタンを初期化
+        this.startButton = new Button(350, 250, 100, 50, "Start");
+
+        // インターフェースを初期化
+        this.interFace = new InterFace(mainWindow);
     }
 
     private void setupOrtho() {
@@ -142,38 +129,34 @@ public class Game {
     private void setupCamera() {
         int[] width = new int[1];
         int[] height = new int[1];
-        GLFW.glfwGetFramebufferSize(window, width, height);
+        GLFW.glfwGetFramebufferSize(mainWindow, width, height);
         updateProjection(width[0], height[0]);
     }
 
     private void loop() {
         // ユーザーがウィンドウを閉じようとするまでレンダリングループを実行
-        while (!GLFW.glfwWindowShouldClose(window)) {
+        while (!GLFW.glfwWindowShouldClose(mainWindow)) {
             update();
             render();
 
-            GLFW.glfwSwapBuffers(window); // カラーバッファを交換
+            GLFW.glfwSwapBuffers(mainWindow); // カラーバッファを交換
             GLFW.glfwPollEvents();
         }
     }
 
     private void update() {
+        // インターフェースの状態を更新
+        interFace.update();
+        handleInput();
         if (gameStarted) {
             // ゲームロジックを更新
             world.update();
+            player.handleInput(interFace.getPressedKey(), interFace.getPressedAction());
+            
             if (!cursorEnabled) {
                 player.update(); // カーソルが非表示の時だけプレイヤーの視点を更新
             }
-        } else {
-            // マウスカーソルの位置を取得
-            double[] xpos = new double[1];
-            double[] ypos = new double[1];
-            GLFW.glfwGetCursorPos(window, xpos, ypos);
-
-            // Y座標を反転させる
-            ypos[0] = 600 - ypos[0];
-
-            startButton.setHovered(startButton.isTouched(xpos[0], ypos[0]));
+            
         }
     }
 
@@ -202,24 +185,51 @@ public class Game {
         }
     }
 
-    private void handleMouseClick(double xpos, double ypos) {
+    private void handleInput() {
         if(gameStarted) {
-            // クリックがプレイヤーのインベントリ内にあるかどうかをチェック
-            //player.checkInventoryClick(xpos, ypos);
-            //return;
-        }
-        else {
-            // Y座標を反転させる
-            ypos = 600 - ypos;
-            // クリックがスタートボタンの範囲内にあるかどうかをチェック
-            if (startButton.isTouched(xpos, ypos)) {
+            if (interFace.isKeyPressed("esc")) {
+                // ゲーム中にESCキーが押されたら、カーソルを表示してゲームを一時停止
+                toggleCursor();
+            }
+        } else {
+            float mouseX = interFace.getMouseX();
+            float mouseY = interFace.getMouseY();
+            startButton.setHovered(startButton.isTouched(mouseX, mouseY));
+    
+            if (interFace.isKeyPressed("enter")) {
                 gamestart();
-
+            }
+            if (startButton.isTouched(mouseX, mouseY) && interFace.isMousePressed()) {
+                gamestart();
             }
         }
 
-
     }
+
+    private void toggleCursor() {
+        if (cursorToggleInProgress) return; // 連打防止
+
+        cursorToggleInProgress = true; // 切り替え中フラグを立てる
+        cursorEnabled = !cursorEnabled; // カーソルの表示状態を切り替え
+        
+        if (cursorEnabled) {
+            GLFW.glfwSetInputMode(mainWindow, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+        } else {
+            GLFW.glfwSetInputMode(mainWindow, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+        }
+
+        // 一定時間後にフラグをリセット
+        new Thread(() -> {
+            try {
+                Thread.sleep(300); // 300ミリ秒待機
+            } catch (InterruptedException e) {
+                System.err.println("カーソル切り替え中にエラーが発生しました: " + e.getMessage());
+            } finally {
+                cursorToggleInProgress = false; // 切り替え完了
+            }
+        }).start();
+    }
+
 
     private void gamestart() {
         gameStarted = true;
@@ -227,14 +237,14 @@ public class Game {
         
         // ゲーム開始時にマウスカーソルを非表示にし、中央に固定
         cursorEnabled = false;
-        GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
-        GLFW.glfwSetCursorPos(window, 400, 300);
+        GLFW.glfwSetInputMode(mainWindow, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+        GLFW.glfwSetCursorPos(mainWindow, 400, 300);
     }
 
     private void cleanup() {
         // ウィンドウのコールバックを解放し、ウィンドウを破棄
-        GLFW.glfwSetWindowShouldClose(window, true);
-        GLFW.glfwDestroyWindow(window);
+        GLFW.glfwSetWindowShouldClose(mainWindow, true);
+        GLFW.glfwDestroyWindow(mainWindow);
 
         // GLFWを終了し、エラーコールバックを解放
         GLFW.glfwTerminate();

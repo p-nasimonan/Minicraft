@@ -8,8 +8,8 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
 public class Button {
-    private float x, y, width, height;
-    private String label;
+    private final float x, y, width, height;
+    private final String label;
     private boolean hovered;
 
     public Button(float x, float y, float width, float height, String label) {

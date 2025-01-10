@@ -28,7 +28,7 @@ public class GameObjectTest {
         Assertions.assertThat(testObject)
             .satisfies(obj -> {
                 Assertions.assertThat(obj.getName()).isEqualTo("test");
-                Assertions.assertThat(obj.getType()).isEqualTo("test");
+                Assertions.assertThat(obj.getId()).isEqualTo("test");
                 Assertions.assertThat(obj.getX()).isEqualTo(0.0f);
                 Assertions.assertThat(obj.getY()).isEqualTo(0.0f);
                 Assertions.assertThat(obj.getZ()).isEqualTo(0.0f);

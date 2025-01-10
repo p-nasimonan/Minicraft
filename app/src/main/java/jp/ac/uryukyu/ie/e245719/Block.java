@@ -8,9 +8,9 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 
 public class Block extends Item {
-    public Block(String type, float x, float y, float z, float width, float height, float depth) {
-        super("block", type, x, y, z, width, height, depth);
-        this.type = type;
+    public Block(String name, String id, float x, float y, float z, float width, float height, float depth) {
+        super("block", id, x, y, z, width, height, depth);
+        this.id = id;
         this.collider = new Collider(x, y, z, width, height, depth);
     }
 
@@ -20,7 +20,7 @@ public class Block extends Item {
         glEnable(GL_DEPTH_TEST);
         
         // ブロックの色を設定
-        if (type.equals("stone")) {
+        if (id.equals("stone")) {
             glColor3f(0.5f, 0.5f, 0.5f); // 灰色
         } else {
             glColor3f(1.0f, 1.0f, 1.0f); // デフォルトの色

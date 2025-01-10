@@ -21,6 +21,7 @@ public class Player extends Mob {
     private static final float MOVE_SPEED = 0.1f;
     private final long window;
     private String mode;
+    private final float eyeY = 1.7f;
 
     /**
      * プレイヤーを初期化します
@@ -32,9 +33,11 @@ public class Player extends Mob {
         this.window = windowHandle;
         this.world = world;
         inventory = new ArrayList<>();
+        // プレイヤーの初期位置を設定
         this.x = 0.0f;
-        this.y = 2.0f; // プレイヤーの目の高さ
+        this.y = 2.0f; 
         this.z = 0.0f;
+
         this.pitch = 0.0f;
         this.yaw = 0.0f;
         this.mode = "survival";
@@ -65,56 +68,25 @@ public class Player extends Mob {
         // 重力の適用
         applyGravity();
 
-        // キーボード入力による移動を処理
-        handleMovement();
-
         debugInfo();
 
         updateCamera();
     }
 
-    /**
-     * キーボード入力による移動を処理します
-     */
-    private void handleMovement() {
-        // 移動方向を計算
-        double radYaw = -Math.toRadians(yaw);
-        float dx = 0.0f;
-        float dz = 0.0f;
-
-        // 前後移動
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS) {
-            dx -= (float) Math.sin(radYaw) * MOVE_SPEED;
-            dz -= (float) Math.cos(radYaw) * MOVE_SPEED;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_S) == GLFW.GLFW_PRESS) {
-            dx += (float) Math.sin(radYaw) * MOVE_SPEED;
-            dz += (float) Math.cos(radYaw) * MOVE_SPEED;
-        }
-
-        // 左右移動
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_A) == GLFW.GLFW_PRESS) {
-            dx -= (float) Math.cos(radYaw) * MOVE_SPEED;
-            dz += (float) Math.sin(radYaw) * MOVE_SPEED;
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_D) == GLFW.GLFW_PRESS) {
-            dx += (float) Math.cos(radYaw) * MOVE_SPEED;
-            dz -= (float) Math.sin(radYaw) * MOVE_SPEED;
-        }
-
-        // ジャンプとしゃがみ
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_SPACE) == GLFW.GLFW_PRESS) {
-            jump();
-        }
-        if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS) {
-            sneak();
-        }
-
-        // 実際の移動を適用
-        if (dx != 0 || dz != 0) {
-            move(dx, 0, dz);
+    public void handleInput(int key, int action) {
+        if (action == GLFW.GLFW_PRESS) {
+            switch (key) {
+                case GLFW.GLFW_KEY_W -> move("forward");
+                case GLFW.GLFW_KEY_S -> move("backward");
+                case GLFW.GLFW_KEY_A -> move("left");
+                case GLFW.GLFW_KEY_D -> move("right");
+                case GLFW.GLFW_KEY_SPACE -> jump();
+                case GLFW.GLFW_KEY_LEFT_SHIFT -> sneak();
+            }
         }
     }
+
+
 
     @Override
     public void render() {
@@ -124,23 +96,19 @@ public class Player extends Mob {
     public void setCamera() {
         glRotatef(pitch, 1.0f, 0.0f, 0.0f);  // 上下の視点
         glRotatef(yaw, 0.0f, 1.0f, 0.0f);    // 左右の視点
-        glTranslatef(-x, -y, -z);             // カメラ位置
+        glTranslatef(-x, -(y+eyeY), -z);             // カメラ位置
     }
 
-    public void move(float dx, float dy, float dz) {
-        float newX = this.x + dx;
-        float newY = this.y + dy;
-        float newZ = this.z + dz;
-
-        if (!checkCollision(newX, newY, newZ)) {
-            this.x = newX;
-            this.y = newY;
-            this.z = newZ;
-
-        }
-        collider.setPosition(x, y, z);  // Colliderの位置も更新
+    public void putBlock() {
+        // ブロックを配置するロジックをここに追加
+        
     }
 
+    /**
+     * プレイヤーの回転を更新します
+     * @param deltaPitch ピッチ角度の変化量
+     * @param deltaYaw ヨー角度の変化量
+     */
     public void rotate(float deltaPitch, float deltaYaw) {
         this.pitch += deltaPitch;
         this.yaw += deltaYaw;
@@ -175,19 +143,19 @@ public class Player extends Mob {
         return camera;
     }
 
+
     @Override
     public void jump() {
         switch (this.mode) {
-            case "creative":
-                world.gravity(false);
-                move(0, MOVE_SPEED, 0);
-                break;
-            default:
+            case "creative" -> {
+                move("up");
+            }
+            default -> {
                 if (onGround) {
                     vy = 0.2f;  // ジャンプの初速度
                     onGround = false;
                 }
-                break;
+            }
         }
     }
 
@@ -212,6 +180,50 @@ public class Player extends Mob {
         System.out.println("  OnGround: " + onGround);
         System.out.println("  Vertical Velocity: " + vy);
         System.out.println("  Camera Rotation: (pitch: " + pitch + ", yaw: " + yaw + ")");
+    }
+
+    /**
+     * プレイヤーを指定された方向に移動させます
+     * @param direction 移動方向 ("forward", "backward", "left", "right", "up", "down")
+     */
+    public void move(String direction) {
+        double radYaw = -Math.toRadians(yaw);
+        float dx = 0.0f;
+        float dy = 0.0f;
+        float dz = 0.0f;
+
+        switch (direction) {
+            case "forward" -> {
+                dx = -(float) Math.sin(radYaw) * MOVE_SPEED;
+                dz = -(float) Math.cos(radYaw) * MOVE_SPEED;
+            }
+            case "backward" -> {
+                dx = (float) Math.sin(radYaw) * MOVE_SPEED;
+                dz = (float) Math.cos(radYaw) * MOVE_SPEED;
+            }
+            case "left" -> {
+                dx = -(float) Math.cos(radYaw) * MOVE_SPEED;
+                dz = (float) Math.sin(radYaw) * MOVE_SPEED;
+            }
+            case "right" -> {
+                dx = (float) Math.cos(radYaw) * MOVE_SPEED;
+                dz = -(float) Math.sin(radYaw) * MOVE_SPEED;
+            }
+            case "up" -> dy = MOVE_SPEED;
+            case "down" -> dy = -MOVE_SPEED;
+        }
+
+        float newX = this.x + dx;
+        float newY = this.y + dy;
+        float newZ = this.z + dz;
+
+        if (!checkCollision(newX, newY, newZ)) {
+            this.x = newX;
+            this.y = newY;
+            this.z = newZ;
+            collider.setPosition(x, y, z);
+            updateCamera();
+        }
     }
 
 }

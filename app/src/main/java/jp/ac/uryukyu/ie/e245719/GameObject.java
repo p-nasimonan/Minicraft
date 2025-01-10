@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 public abstract class GameObject {
     protected String name;
-    protected String type;
+    protected String id;
     protected float x;
     protected float y;
     protected float z;
@@ -21,9 +21,9 @@ public abstract class GameObject {
     protected float vy = 0.0f;
     protected static final float TERMINAL_VELOCITY = -0.5f;
 
-    public GameObject(String name, String type, float x, float y, float z, float width, float height, float depth) {
+    public GameObject(String name, String id, float x, float y, float z, float width, float height, float depth) {
         this.name = name;
-        this.type = type;
+        this.id = id;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -50,7 +50,7 @@ public abstract class GameObject {
 
     // 既存のgetterメソッド
     public String getName() { return name; }
-    public String getType() { return type; }
+    public String getId() { return id; }
     public float getX() { return x; }
     public float getY() { return y; }
     public float getZ() { return z; }
@@ -70,7 +70,7 @@ public abstract class GameObject {
               Position: (%.2f, %.2f, %.2f)
               Size: (%.2f, %.2f, %.2f)
             """.formatted(
-                name, type, x, y, z,
+                name, id, x, y, z,
                 collider.getX(), collider.getY(), collider.getZ(),
                 collider.getWidth(), collider.getHeight(), collider.getDepth()
             ));
