@@ -60,6 +60,10 @@ public class World {
         return enemies;
     }
 
+    public void putBlock(Block block) {
+        blocks.add(block);
+        gameObjects.add(block);
+    }
 
     public float getG() {
         return G;

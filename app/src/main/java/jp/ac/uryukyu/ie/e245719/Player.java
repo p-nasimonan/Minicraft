@@ -73,7 +73,7 @@ public class Player extends Mob {
         updateCamera();
     }
 
-    public void handleInput(int key, int action) {
+    public void handleInput(int key, int action, float mX, float mY, boolean isMousePressed) {
         if (action == GLFW.GLFW_PRESS) {
             switch (key) {
                 case GLFW.GLFW_KEY_W -> move("forward");
@@ -83,6 +83,9 @@ public class Player extends Mob {
                 case GLFW.GLFW_KEY_SPACE -> jump();
                 case GLFW.GLFW_KEY_LEFT_SHIFT -> sneak();
             }
+        }
+        if (isMousePressed) {
+            placeBlockInDirection();
         }
     }
 
@@ -99,9 +102,10 @@ public class Player extends Mob {
         glTranslatef(-x, -(y+eyeY), -z);             // カメラ位置
     }
 
-    public void putBlock() {
+    public void putBlock(int x, int y, int z) {
         // ブロックを配置するロジックをここに追加
-        
+        Block block = new Block("block", "stone", x, y, z, 1, 1, 1);
+        world.putBlock(block);
     }
 
     /**
@@ -224,6 +228,35 @@ public class Player extends Mob {
             collider.setPosition(x, y, z);
             updateCamera();
         }
+    }
+
+    /**
+     * プレイヤーの向いている方向にブロックを置きます
+     */
+    public void placeBlockInDirection() {
+        // プレイヤーの位置を取得
+        float playerX = this.x;
+        float playerY = this.y; // プレイヤーの高さを考慮
+        float playerZ = this.z;
+
+        // 距離
+        int distance = 2;
+
+        // プレイヤーの向きを取得
+        double radYaw = Math.toRadians(yaw);
+        
+        
+        // 向いている方向のベクトルを計算
+        float forwardX = (float) (Math.sin(radYaw)) * distance; // X成分
+        float forwardZ = (float) (-Math.cos(radYaw)) * distance; // Z成分
+
+        // ブロックを置く位置を計算
+        int blockX = (int) (playerX + forwardX);
+        int blockY = (int) (playerY) - 1; // プレイヤーの高さから１ブロッック下
+        int blockZ = (int) (playerZ + forwardZ);
+
+        // ブロックを配置
+        putBlock(blockX, blockY, blockZ);
     }
 
 }

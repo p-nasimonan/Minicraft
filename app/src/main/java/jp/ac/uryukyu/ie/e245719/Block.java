@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 
 public class Block extends Item {
-    public Block(String name, String id, float x, float y, float z, float width, float height, float depth) {
+    public Block(String name, String id, int x, int y, int z, float width, float height, float depth) {
         super("block", id, x, y, z, width, height, depth);
         this.id = id;
         this.collider = new Collider(x, y, z, width, height, depth);

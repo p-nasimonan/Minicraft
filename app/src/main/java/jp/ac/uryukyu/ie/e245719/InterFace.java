@@ -25,23 +25,23 @@ public class InterFace {
             GLFW.glfwGetCursorPos(window, xpos, ypos);
 
             ypos[0] = 600 - ypos[0];
-            mouseX = (float) xpos[0];
-            mouseY = (float) ypos[0];
+            this.mouseX = (float) xpos[0];
+            this.mouseY = (float) ypos[0];
             if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
-                isMousePressed = true;
+                this.isMousePressed = true;
             } else {
-                isMousePressed = false;
+                this.isMousePressed = false;
             }
         });
 
         // キーボードのコールバックを設定
         GLFW.glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
-            pressedAction = action;
+            this.pressedAction = action;
             if (action == GLFW.GLFW_PRESS) {
-                isKeyPressed = true;
-                pressedKey = key;
+                this.isKeyPressed = true;
+                this.pressedKey = key;
             } else {
-                isKeyPressed = false;
+                this.isKeyPressed = false;
             }
         });
     }
@@ -55,19 +55,19 @@ public class InterFace {
         GLFW.glfwGetCursorPos(windowHandle, xpos, ypos);
 
         ypos[0] = 600 - ypos[0];
-        mouseX = (float) xpos[0];
-        mouseY = (float) ypos[0];
+        this.mouseX = (float) xpos[0];
+        this.mouseY = (float) ypos[0];
     }
 
     public float getMouseX() {
-        return mouseX;
+        return this.mouseX;
     }
     public float getMouseY() {
-        return mouseY;
+        return this.mouseY;
     }
 
     public boolean isKeyPressed() {
-        return isKeyPressed;
+        return this.isKeyPressed;
     }
     public boolean isKeyPressed(String key) {
         return switch (key) {
@@ -78,13 +78,13 @@ public class InterFace {
         };
     }
     public boolean isMousePressed() {
-        return isMousePressed;
+        return this.isMousePressed;
     }
     public int getPressedKey() {
-        return pressedKey;
+        return this.pressedKey;
     }
     public int getPressedAction() {
-        return pressedAction;
+        return this.pressedAction;
     }
     
 }

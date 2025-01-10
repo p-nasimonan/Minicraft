@@ -151,7 +151,7 @@ public class Game {
         if (gameStarted) {
             // ゲームロジックを更新
             world.update();
-            player.handleInput(interFace.getPressedKey(), interFace.getPressedAction());
+            player.handleInput(interFace.getPressedKey(), interFace.getPressedAction(), interFace.getMouseX(), interFace.getMouseY(), interFace.isMousePressed());
             
             if (!cursorEnabled) {
                 player.update(); // カーソルが非表示の時だけプレイヤーの視点を更新
