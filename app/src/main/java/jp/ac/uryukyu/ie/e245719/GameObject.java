@@ -49,14 +49,15 @@ public abstract class GameObject {
     }
 
     // 既存のgetterメソッド
-    public String getName() { return name; }
-    public String getId() { return id; }
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public float getZ() { return z; }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
-    public float getDepth() { return depth; }
+    public String getName() { return this.name; }
+    public String getId() { return this.id; }
+    public float getX() { return this.x; }
+    public float getY() { return this.y; }
+    public float getZ() { return this.z; }
+    public float getWidth() { return this.width; }
+    public float getHeight() { return this.height; }
+    public float getDepth() { return this.depth; }
+
 
     /**
      * オブジェクトの状態をデバッグ出力します

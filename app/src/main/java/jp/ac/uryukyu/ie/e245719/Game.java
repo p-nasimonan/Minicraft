@@ -38,10 +38,6 @@ public class Game {
     }
 
     public long createWindow() {
-        // スレッドチェックを追加
-        if (!Thread.currentThread().getName().equals("main")) {
-            throw new IllegalStateException("GLFWはメインスレッドでのみ使用できます。JVMを-XstartOnFirstThreadで起動してください。");
-        }
         long win;
         // エラーコールバックを設定
         GLFWErrorCallback.createPrint(System.err).set();
@@ -188,10 +184,10 @@ public class Game {
         if (gameStarted) {
             // ゲームロジックを更新
             world.update();
-            player.handleInput(interFace.getPressedKey(), interFace.getPressedAction(), interFace.getMouseX(), interFace.getMouseY(), interFace.isMousePressed());
             
             if (!cursorEnabled) {
                 player.update(); // カーソルが非表示の時だけプレイヤーの視点を更新
+                player.handleInput(interFace.getPressedKey(), interFace.getPressedAction(), interFace.getMouseX(), interFace.getMouseY(), interFace.isMousePressed());
             }
             
         }

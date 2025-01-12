@@ -1,6 +1,7 @@
 package jp.ac.uryukyu.ie.e245719;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 
@@ -26,5 +27,8 @@ public class TestBase {
         // OpenGLコンテキストを作成
         GLFW.glfwMakeContextCurrent(dummyWindow);
         GL.createCapabilities();
+    }
+    @Test
+    public void dummy() {
     }
 } 

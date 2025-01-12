@@ -32,7 +32,7 @@ public abstract class Mob extends GameObject {
     }
 
     public int getHp() {
-        return hp;
+        return this.hp;
     }
 
 

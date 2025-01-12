@@ -1,7 +1,8 @@
 package jp.ac.uryukyu.ie.e245719;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 class TestMob extends Mob {
     public TestMob(String name, String id, int attack, float x, float y, float z, int hp, float width, float height, float depth) {
@@ -27,6 +28,7 @@ class MobTest extends TestBase {
     @Test
     void ジャンプ処理が正しく機能する() {
         TestMob mob = new TestMob("testMob", "mob1", 10, 0, 0, 0, 100, 1, 1, 1);
+        mob.onGround = true;
         mob.jump();
         assertNotEquals(0, mob.vy);
     }

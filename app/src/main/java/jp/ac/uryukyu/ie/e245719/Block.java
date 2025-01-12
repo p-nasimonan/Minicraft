@@ -1,11 +1,6 @@
 package jp.ac.uryukyu.ie.e245719;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Block extends Item {
     public Block(String name, String id, int x, int y, int z, float width, float height, float depth) {

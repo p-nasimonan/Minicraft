@@ -1,14 +1,15 @@
 package jp.ac.uryukyu.ie.e245719;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 class EnemyTest extends TestBase {
 
     @Test
     void 敵が正しく初期化される() {
         Enemy enemy = new Enemy("enemy1", "Enemy", 10, 0, 0, 0, 100, 1, 1, 1);
-        assertEquals("enemy1", enemy.getId());
+        assertEquals("Enemy", enemy.getId());
         assertEquals(100, enemy.getHp());
     }
 

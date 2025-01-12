@@ -10,7 +10,7 @@ plugins {
     application
 }
 
-val lwjglVersion = "3.3.5"
+val lwjglVersion = "3.3.6"
 
 // OSに応じてネイティブライブラリを選択
 val lwjglNatives = Pair(
@@ -74,6 +74,12 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.24.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+
+    implementation("org.lwjgl:lwjgl:$lwjglVersion")
+    implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+    // 他の LWJGL モジュールも必要に応じて追加
 }
 
 java {
@@ -99,25 +105,64 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.test {
+    // Macの場合に特定のJVM引数を設定
     if (System.getProperty("os.name").lowercase().contains("mac")) {
         jvmArgs = listOf("-XstartOnFirstThread")
     }
-        
+    
     // JUnitプラットフォームを使用
     useJUnitPlatform()
 }
 
-tasks.register<JavaExec>("jpackage") {
-    group = "build"
-    mainClass.set("jp.ac.uryukyu.ie.e245719.Main")
-    classpath = sourceSets["main"].runtimeClasspath
-    jvmArgs = listOf("-XstartOnFirstThread")
-}
 
 tasks.jar {
+    archiveBaseName.set("minicraft") // JARファイルの基本名を設定
+    archiveVersion.set("1.0") // バージョンを設定
     manifest {
-        attributes(
-            "Main-Class" to "jp.ac.uryukyu.ie.e245719.Main" // メインクラスを指定
-        )
+        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main" // メインクラスを指定
     }
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main"
+    }
+}
+
+tasks.register<Jar>("bootJar") {
+    group = "build"
+    description = "Assembles an executable jar archive containing the main classes and their dependencies."
+    from(sourceSets.main.get().output)
+    manifest {
+        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main"
+    }
+    dependsOn(configurations.runtimeClasspath)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+}
+
+tasks.register<Jar>("fatJar") {
+    archiveBaseName.set("minicraft")
+    archiveVersion.set("1.0")
+    manifest {
+        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main"
+    }
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+
+    // 重複処理戦略を設定
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// 他のタスクに依存関係を追加
+tasks.named("distZip") {
+    dependsOn("fatJar")
+}
+
+tasks.named("distTar") {
+    dependsOn("fatJar")
+}
+
+tasks.named("startScripts") {
+    dependsOn("fatJar")
 }

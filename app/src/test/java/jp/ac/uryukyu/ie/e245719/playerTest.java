@@ -1,10 +1,12 @@
 package jp.ac.uryukyu.ie.e245719;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.lwjgl.glfw.GLFW;
 
-public class playerTest {
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL;
+
+public class PlayerTest {
     private static World world;
     private static long dummyWindow;
 
@@ -24,6 +26,10 @@ public class playerTest {
             throw new RuntimeException("ウィンドウの作成に失敗しました");
         }
 
+
+        // OpenGLコンテキストを作成
+        GLFW.glfwMakeContextCurrent(dummyWindow);
+        GL.createCapabilities();
         // テスト用のWorldを作成
         world = new World();
     }
