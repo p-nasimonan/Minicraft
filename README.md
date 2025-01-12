@@ -2,11 +2,12 @@
 **プログラミングの課題で好きな作品を作るらしいのでJAVAといえばマインクラフトだと思い、作ろうとした**
 
  オブジェクト指向のいい練習にもなるだろうし...
-![image](https://github.com/user-attachments/assets/28732c20-fd68-400e-a928-cc9087b15609)
+![image](https://github.com/user-attachments/assets/a765a005-b2ce-494f-a9df-b033852ed348)
+- 画像：最新版のワールドの画面
 
 ### LWJGLの厄介ポイント
 - macOSの場合jvmの引数に"-XstartOnFirstThread"をつけないといけない
- - setting.jsonにこれを書き込むと解決できる。
+  - VScodeで実行する場合setting.jsonにこれを書き込むと解決できる。
     ```.vscode/setting.json
         "java.test.config": {
         "vmArgs": ["-XstartOnFirstThread"]
@@ -137,10 +138,17 @@ classDiagram
     GameObject --> Collider
 ```
 ## ソースコードを実行するには
- - java開発環境
+ - java開発環境、Gradleが必要
  - macの場合
      - "vmArgs"に "-XstartOnFirstThread"を追加
 - windowsではいらない
+- Mainクラスを実行するとゲーム画面が起動する
+
+## ゲームの操作方法
+1. 再生ボタンのようなボタンが出てくるからそれをクリックする
+2. WASDで移動でき、マウス操作で視点操作ができる。
+3.  ESCキーでマウスカーソルの表示・非表示を切り替えられる
+4.  マウスをクリックすると視点と同じ方向にブロックを置ける
 
 ## 試したこと
 - ビットマップフォントを使えるようにしようとした
@@ -159,4 +167,4 @@ classDiagram
 今から動作しないテストを書きます。
 
 ## インストールInstallation
-リリースノート
+[ここからインストール(ver1.0)](https://github.com/p-nasimonan/Minicraft/releases/download/v1.0/minicraft-1.0.jar)
