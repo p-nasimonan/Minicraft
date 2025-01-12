@@ -7,15 +7,6 @@
             "name": "Launch Game",
             "request": "launch",
             "mainClass": "jp.ac.uryukyu.ie.e245719.Main",
-
-        },
-        {
-            "type": "java",
-            "name": "Launch Player Test",
-            "request": "launch",
-            "mainClass": "org.junit.runner.JUnitCore",
-            "args": "jp.ac.uryukyu.ie.e245719.playerTest",
-            "vmArgs": "-XstartOnFirstThread"
         }
     ]
 }

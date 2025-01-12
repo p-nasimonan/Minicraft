@@ -6,9 +6,8 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
+    kotlin("jvm") version "1.9.22"
     application
-    kotlin("jvm") version "1.8.0"
 }
 
 val lwjglVersion = "3.3.5"
@@ -74,15 +73,15 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core:3.24.2")
 
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(23))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
-    sourceCompatibility = JavaVersion.VERSION_23
-    targetCompatibility = JavaVersion.VERSION_23
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 application {
@@ -100,7 +99,25 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.test {
-    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+    if (System.getProperty("os.name").lowercase().contains("mac")) {
         jvmArgs = listOf("-XstartOnFirstThread")
+    }
+        
+    // JUnitプラットフォームを使用
+    useJUnitPlatform()
+}
+
+tasks.register<JavaExec>("jpackage") {
+    group = "build"
+    mainClass.set("jp.ac.uryukyu.ie.e245719.Main")
+    classpath = sourceSets["main"].runtimeClasspath
+    jvmArgs = listOf("-XstartOnFirstThread")
+}
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Main-Class" to "jp.ac.uryukyu.ie.e245719.Main" // メインクラスを指定
+        )
     }
 }

@@ -1,7 +1,17 @@
 # マインクラフト風のLWJGLを使ったゲーム
 **プログラミングの課題で好きな作品を作るらしいのでJAVAといえばマインクラフトだと思い、作ろうとした**
-- オブジェクト指向のいい練習にもなるだろうし...
+
+ オブジェクト指向のいい練習にもなるだろうし...
 ![image](https://github.com/user-attachments/assets/28732c20-fd68-400e-a928-cc9087b15609)
+
+### LWJGLの厄介ポイント
+- macOSの場合jvmの引数に"-XstartOnFirstThread"をつけないといけない
+ - setting.jsonにこれを書き込むと解決できる。
+    ```.vscode/setting.json
+        "java.test.config": {
+        "vmArgs": ["-XstartOnFirstThread"]
+    }
+    ```
 
 
 ## クラス図を書いた(mermaid)
@@ -126,6 +136,11 @@ classDiagram
     Player --> MouseInput
     GameObject --> Collider
 ```
+## ソースコードを実行するには
+ - java開発環境
+ - macの場合
+     - "vmArgs"に "-XstartOnFirstThread"を追加
+- windowsではいらない
 
 ## 試したこと
 - ビットマップフォントを使えるようにしようとした
