@@ -6,7 +6,7 @@
 - 画像：最新版のワールドの画面
 
 ### LWJGLの厄介ポイント
-- macOSの場合jvmの引数に"-XstartOnFirstThread"をつけないといけない
+- macOSの場合jvmの引数に"-XstartOnFirstThread"をつけないといけない **(逆にwindowsはこの設定は消してください)**
   - VScodeで実行する場合setting.jsonにこれを書き込むと解決できる。
     ```.vscode/setting.json
         "java.test.config": {

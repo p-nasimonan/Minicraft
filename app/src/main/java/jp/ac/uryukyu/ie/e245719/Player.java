@@ -68,8 +68,6 @@ public class Player extends Mob {
         // 重力の適用
         applyGravity();
 
-        debugInfo();
-
         updateCamera();
     }
 
@@ -82,6 +80,8 @@ public class Player extends Mob {
                 case GLFW.GLFW_KEY_D -> move("right");
                 case GLFW.GLFW_KEY_SPACE -> jump();
                 case GLFW.GLFW_KEY_LEFT_SHIFT -> sneak();
+                case GLFW.GLFW_KEY_E -> openInventory();
+                case GLFW.GLFW_KEY_F3 -> debugInfo(); //トグルにしたい
             }
         }
         if (isMousePressed) {
@@ -257,6 +257,10 @@ public class Player extends Mob {
 
         // ブロックを配置
         putBlock(blockX, blockY, blockZ);
+    }
+
+    public void openInventory() {
+        // インベントリを開くロジックをここに追加
     }
 
 }

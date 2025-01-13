@@ -20,6 +20,7 @@ public abstract class GameObject {
     protected boolean onGround = false;
     protected float vy = 0.0f;
     protected static final float TERMINAL_VELOCITY = -0.5f;
+    protected boolean showInfo = false;
 
     public GameObject(String name, String id, float x, float y, float z, float width, float height, float depth) {
         this.name = name;
@@ -63,6 +64,10 @@ public abstract class GameObject {
      * オブジェクトの状態をデバッグ出力します
      */
     public void debugInfo() {
+        showInfo = !showInfo;
+        if (showInfo = false) {
+            return;
+        }
         System.out.println("""
             === %s Debug Info ===
             Type: %s
@@ -104,8 +109,10 @@ public abstract class GameObject {
         
         for (Block block : world.getBlocks()) {
             if (collider.intersects(block.getCollider())) {
-                System.out.println("Collision detected with block at: (" + 
-                    block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
+                if (showInfo) {
+                    System.out.println("Collision detected with block at: (" + 
+                        block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
+                }
                 collision = true;
                 // 下方向への移動で衝突した場合、地面に着地したとみなす
                 if (newY < y) {
