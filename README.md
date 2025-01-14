@@ -64,21 +64,25 @@ classDiagram
         -yaw: float
         -camera: Camera
         -mouseInput: MouseInput
+        +setCamera()
+        
+    }
+    class Action {
+        -actor: GameObject
+        -world: World
         +move()
-        +rotate()
         +jump()
         +sneak()
-        +setCamera()
+        +attack()
+        +hit()
+        +placeBlockInDirection()
     }
 
     class Mob {
         <<abstract>>
-        #attack: int
-        #hp: int
-        +move()
-        +jump()
-        +attack()
-        +hit()
+        -attack: int
+        -hp: int
+        #action: Action
     }
 
     class Enemy {
@@ -135,6 +139,9 @@ classDiagram
     Mob <|-- Enemy
     Player --> Camera
     Player --> MouseInput
+    Mob --> Action
+    Action --> World
+    Action --> GameObject
     GameObject --> Collider
 ```
 ## ソースコードを実行するには

@@ -1,40 +1,20 @@
 package jp.ac.uryukyu.ie.e245719;
 
 public abstract class Mob extends GameObject {
-    protected int attack;
-    protected int hp;
+    private int attack;
+    private int hp;
+    public Action action;
 
-    public Mob(String name, String id,  int attack, float x, float y, float z, int hp, float width, float height, float depth) {
+    public Mob(String name, String id, int attack, float x, float y, float z, int hp, float width, float height, float depth) {
         super(name, id, x, y, z, width, height, depth);
         this.attack = attack;
         this.hp = hp;
+        this.action = new Action(this, world);
         this.collider = new Collider(x, y, z, width, height, depth);
     }
 
-    public void move() {
-        // 移動処理
-    }
+    // Getters
+    public int getAttack() { return attack; }
+    public int getHp() { return hp; }
 
-    public void jump() {
-        // ジャンプ処理
-        if (onGround) {
-            vy = 0.2f;  // ジャンプの初速度
-            onGround = false;
-        }
-    }
-
-    public void attack() {
-        // 攻撃処理
-    }
-
-    public void hit() {
-        // 被ダメージ処理
-    }
-
-    public int getHp() {
-        return this.hp;
-    }
-
-
-    
 }

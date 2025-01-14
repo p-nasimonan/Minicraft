@@ -1,6 +1,11 @@
 package jp.ac.uryukyu.ie.e245719;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
 
 public class Block extends Item {
     public Block(String name, String id, int x, int y, int z, float width, float height, float depth) {
@@ -38,7 +43,7 @@ public class Block extends Item {
 
     @Override
     public boolean checkCollision(float newX, float newY, float newZ) {
-        return collider.intersects(new Collider(newX, newY, newZ, 1, 1, 1));
+        return getCollider().intersects(new Collider(newX, newY, newZ, 1, 1, 1));
     }
     
 }

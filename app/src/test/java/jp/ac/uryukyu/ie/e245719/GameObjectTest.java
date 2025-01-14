@@ -1,6 +1,9 @@
 package jp.ac.uryukyu.ie.e245719;
 
 import org.assertj.core.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class TestGameObject extends GameObject {
@@ -39,13 +42,13 @@ public class GameObjectTest {
         Assertions.assertThat(testObject)
             .satisfies(obj -> {
                 Assertions.assertThat(obj.getName()).isEqualTo("test");
-                Assertions.assertThat(obj.getId()).isEqualTo("test");
-                Assertions.assertThat(obj.getX()).isEqualTo(0.0f);
-                Assertions.assertThat(obj.getY()).isEqualTo(0.0f);
-                Assertions.assertThat(obj.getZ()).isEqualTo(0.0f);
-                Assertions.assertThat(obj.getWidth()).isEqualTo(1.0f);
-                Assertions.assertThat(obj.getHeight()).isEqualTo(1.0f);
-                Assertions.assertThat(obj.getDepth()).isEqualTo(1.0f);
+                Assertions.assertThat(obj.id).isEqualTo("test");
+                Assertions.assertThat(obj.x).isEqualTo(0.0f);
+                Assertions.assertThat(obj.y).isEqualTo(0.0f);
+                Assertions.assertThat(obj.z).isEqualTo(0.0f);
+                Assertions.assertThat(obj.width).isEqualTo(1.0f);
+                Assertions.assertThat(obj.height).isEqualTo(1.0f);
+                Assertions.assertThat(obj.depth).isEqualTo(1.0f);
             });
     }
 
@@ -56,12 +59,12 @@ public class GameObjectTest {
         
         Assertions.assertThat(collider)
             .satisfies(c -> {
-                Assertions.assertThat(c.getX()).isEqualTo(0.0f);
-                Assertions.assertThat(c.getY()).isEqualTo(0.0f);
-                Assertions.assertThat(c.getZ()).isEqualTo(0.0f);
-                Assertions.assertThat(c.getWidth()).isEqualTo(1.0f);
-                Assertions.assertThat(c.getHeight()).isEqualTo(1.0f);
-                Assertions.assertThat(c.getDepth()).isEqualTo(1.0f);
+                Assertions.assertThat(c.x).isEqualTo(0.0f);
+                Assertions.assertThat(c.y).isEqualTo(0.0f);
+                Assertions.assertThat(c.z).isEqualTo(0.0f);
+                Assertions.assertThat(c.width).isEqualTo(1.0f);
+                Assertions.assertThat(c.height).isEqualTo(1.0f);
+                Assertions.assertThat(c.depth).isEqualTo(1.0f);
             });
     }
 
@@ -95,4 +98,23 @@ public class GameObjectTest {
             .contains("NO");
     }
 
+    @Test
+    public void 衝突判定が正しく機能する() {
+        TestGameObject obj1 = new TestGameObject("obj1", "test", 0, 0, 0, 1, 1, 1);
+        TestGameObject obj2 = new TestGameObject("obj2", "test", 0.5f, 0.5f, 0.5f, 1, 1, 1);
+        Assertions.assertThat(obj1.getCollider().intersects(obj2.getCollider()))
+            .as("重なっているオブジェクトは衝突を検出するべきです")
+            .isTrue();
+    }
+
+    @Test
+    public void 間違った名前に変更した場合正常に例外が起こる() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            TestGameObject obj1 = new TestGameObject("testBlock", "stone", 0, 0, 0, 1, 1, 1);
+            obj1.setName("a");
+        });
+        assertNotNull(exception);
+        System.out.println("Actual exception message: " + exception.getMessage());
+        assertTrue(exception.getMessage().contains("名前は1文字以上16時未満で設定してください"));
+    }
 }

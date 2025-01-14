@@ -9,10 +9,12 @@ public class InterFace {
     private boolean isMousePressed = false;
     private int pressedKey;
     private int pressedAction;
+    private MouseInput mouseInput;
 
 
     public InterFace(long windowHandle) {
         this.windowHandle = windowHandle;
+        this.mouseInput = new MouseInput(windowHandle);
         setup();
 
     }
@@ -87,4 +89,10 @@ public class InterFace {
         return this.pressedAction;
     }
     
+    public void setMouseInput(MouseInput mouseInput) {
+        this.mouseInput = mouseInput;
+    }
+    public MouseInput getMouseInput() {
+        return this.mouseInput;
+    }
 }

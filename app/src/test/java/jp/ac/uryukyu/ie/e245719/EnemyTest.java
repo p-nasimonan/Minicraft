@@ -9,7 +9,7 @@ class EnemyTest extends TestBase {
     @Test
     void 敵が正しく初期化される() {
         Enemy enemy = new Enemy("enemy1", "Enemy", 10, 0, 0, 0, 100, 1, 1, 1);
-        assertEquals("Enemy", enemy.getId());
+        assertEquals("Enemy", enemy.id);
         assertEquals(100, enemy.getHp());
     }
 

@@ -1,7 +1,8 @@
 package jp.ac.uryukyu.ie.e245719;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ItemTest extends TestBase {
 
@@ -9,7 +10,7 @@ class ItemTest extends TestBase {
     void アイテムが正しく初期化される() {
         Item item = new Item("testItem", "item1", 0, 0, 0, 1, 1, 1);
         assertEquals("testItem", item.getName());
-        assertEquals("item1", item.getId());
+        assertEquals("item1", item.id);
     }
 
     @Test

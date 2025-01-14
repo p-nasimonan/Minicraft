@@ -7,20 +7,16 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 public abstract class GameObject {
-    protected String name;
+    private String name;
     protected String id;
-    protected float x;
-    protected float y;
-    protected float z;
-    protected final float width;
-    protected final float height;
-    protected final float depth;
-    protected  Collider collider;
-    protected  World world;
-    protected boolean onGround = false;
-    protected float vy = 0.0f;
-    protected static final float TERMINAL_VELOCITY = -0.5f;
-    protected boolean showInfo = false;
+    protected float x, y, z;
+    protected final float width, height, depth;
+    public Collider collider;
+    protected World world;
+    protected boolean onGround;
+    protected float vy;
+    protected boolean showInfo;
+    private static final float TERMINAL_VELOCITY = -0.5f;
 
     public GameObject(String name, String id, float x, float y, float z, float width, float height, float depth) {
         this.name = name;
@@ -31,13 +27,23 @@ public abstract class GameObject {
         this.width = width;
         this.height = height;
         this.depth = depth;
+        this.onGround = false;
+        this.vy = 0.0f;
+        this.showInfo = false;
         this.collider = new Collider(x, y, z, width, height, depth);
     }
 
-
     public abstract void update();
     public abstract void render();
-
+    
+    //アクセサ-----------------------------------------------------
+    // Getters
+    public String getName() {
+        if (name.length() < 1) {
+            throw new IllegalStateException("Name is not initialized");
+        } 
+        return name;
+    }
     /**
      * オブジェクトのColliderを取得します
      * @return オブジェクトのCollider
@@ -49,51 +55,31 @@ public abstract class GameObject {
         return collider;
     }
 
-    // 既存のgetterメソッド
-    public String getName() { return this.name; }
-    public String getId() { return this.id; }
-    public float getX() { return this.x; }
-    public float getY() { return this.y; }
-    public float getZ() { return this.z; }
-    public float getWidth() { return this.width; }
-    public float getHeight() { return this.height; }
-    public float getDepth() { return this.depth; }
-
-
-    /**
-     * オブジェクトの状態をデバッグ出力します
-     */
-    public void debugInfo() {
-        showInfo = !showInfo;
-        if (showInfo = false) {
-            return;
+    
+    //Setters
+    public void setName(String name) {
+        if (name.length() < 1 || name.length() > 16) {
+            throw new IllegalArgumentException("名前は1文字以上16時未満で設定してください");
         }
-        System.out.println("""
-            === %s Debug Info ===
-            Type: %s
-            Position: (%.2f, %.2f, %.2f)
-            Collider: 
-              Position: (%.2f, %.2f, %.2f)
-              Size: (%.2f, %.2f, %.2f)
-            """.formatted(
-                name, id, x, y, z,
-                collider.getX(), collider.getY(), collider.getZ(),
-                collider.getWidth(), collider.getHeight(), collider.getDepth()
-            ));
+        this.name = name;
+    }
+
+    // 位置の更新は一括で行う
+    protected void setPosition(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        if (collider != null) {
+            collider.setPosition(x, y, z);
+        }
     }
 
     /**
-     * オブジェクトの衝突状態をチェックします
-     * @param other 衝突を確認する対象のオブジェクト
-     * @return 衝突情報を含む文字列
+     * オブジェクトのColliderを設定します
+     * @param collider オブジェクトのCollider
      */
-    public String checkCollisionInfo(GameObject other) {
-        if (collider == null || other.getCollider() == null) {
-            return "Collider not initialized";
-        }
-        boolean isColliding = collider.intersects(other.getCollider());
-        return String.format("Collision between %s and %s: %s", 
-            this.name, other.name, isColliding ? "YES" : "NO");
+    protected void setCollider(Collider collider) {
+        this.collider = collider;
     }
 
     /**
@@ -107,11 +93,11 @@ public abstract class GameObject {
         collider.setPosition(newX, newY, newZ);
         boolean collision = false;
         
-        for (Block block : world.getBlocks()) {
-            if (collider.intersects(block.getCollider())) {
-                if (showInfo) {
+        for (GameObject gameobject : world.getGameObjects()) {
+            if (collider.intersects(gameobject.getCollider())) {
+                if (showInfo == true) {
                     System.out.println("Collision detected with block at: (" + 
-                        block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
+                        gameobject.x + ", " + gameobject.y + ", " + gameobject.z + ")");
                 }
                 collision = true;
                 // 下方向への移動で衝突した場合、地面に着地したとみなす
@@ -238,7 +224,6 @@ public abstract class GameObject {
                 y = newY;
                 collider.setPosition(x, y, z);
             } else {
-                System.out.printf("Collision detected while falling at position (%.2f, %.2f, %.2f) with vertical velocity %.2f%n", x, newY, z, vy);
                 vy = 0;
                 onGround = true;
             }
@@ -250,6 +235,42 @@ public abstract class GameObject {
                 onGround = false;
             }
         }
+    }
+
+    //Debug-----------------------------------------------------
+    /**
+     * オブジェクトの状態をデバッグ出力します
+     */
+    public void debugInfo() {
+        showInfo = !showInfo;
+        if (showInfo == true) {
+        
+            System.out.println("""
+                === %s Debug Info ===
+                Type: %s
+                Position: (%.2f, %.2f, %.2f)
+                Collider: 
+                Position: (%.2f, %.2f, %.2f)
+                Size: (%.2f, %.2f, %.2f)
+                """.formatted(
+                    name, id, x, y, z,
+                    collider.x, collider.y, collider.z,
+                    collider.width, collider.height, collider.depth
+                ));
+        }
+    }
+    /**
+     * オブジェクトの衝突状態をチェックします
+     * @param other 衝突を確認する対象のオブジェクト
+     * @return 衝突情報を含む文字列
+     */
+    public String checkCollisionInfo(GameObject other) {
+        if (collider == null || other.getCollider() == null) {
+            return "Collider not initialized";
+        }
+        boolean isColliding = collider.intersects(other.getCollider());
+        return String.format("Collision between %s and %s: %s", 
+            this.name, other.name, isColliding ? "YES" : "NO");
     }
 
 }

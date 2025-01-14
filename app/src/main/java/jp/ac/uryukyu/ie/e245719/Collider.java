@@ -4,8 +4,8 @@ package jp.ac.uryukyu.ie.e245719;
  * 衝突判定を管理するクラス
  */
 public class Collider {
-    private float x, y, z;
-    private final float width, height, depth;
+    public float x, y, z;
+    public final float width, height, depth;
 
     /**
      * Colliderを初期化します
@@ -88,13 +88,6 @@ public class Collider {
         };
     }
 
-    // 既存のgetterメソッド
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public float getZ() { return z; }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
-    public float getDepth() { return depth; }
 
     /**
      * 衝突時の押し戻し量を計算します

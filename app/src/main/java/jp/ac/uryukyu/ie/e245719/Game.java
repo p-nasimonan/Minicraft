@@ -82,15 +82,16 @@ public class Game {
     }
 
     private void gameInit() {
-        // ゲームオブジェクトを初期化
-        this.world = new World();
-        this.player = new Player(mainWindow, world, 0, 2, 0);
-
         // スタートボタンを初期化
         this.startButton = new Button(350, 250, 100, 50, "Start");
 
         // インターフェースを初期化
         this.interFace = new InterFace(mainWindow);
+
+
+        // ゲームオブジェクトを初期化
+        this.world = new World();
+        this.player = new Player(interFace, world, 0, 2, 0);
 
         // FPS計測の初期化
         lastFpsTime = System.currentTimeMillis();
@@ -156,7 +157,7 @@ public class Game {
                 frames = 0;
                 lastFpsTime = System.currentTimeMillis();
                 // FPSをコンソールに出力（デバッグ用）
-                System.out.println("FPS: " + fps);
+                //System.out.println("FPS: " + fps);
             }
 
             // 入力処理
