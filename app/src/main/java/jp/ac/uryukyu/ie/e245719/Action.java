@@ -100,21 +100,25 @@ public class Action {
 
     /**
      * プレイヤーの向いている方向にブロックを設置します
+     * @param pitch プレイヤーの向いている方向（度数）
      * @param yaw プレイヤーの向いている方向（度数）
+     * @param blockType ブロックの種類
      */
-    public void placeBlockInDirection(float yaw, String blockType) {
+    public void placeBlockInDirection(float pitch, float yaw, String blockType) {
         float playerX = actor.x;
         float playerY = actor.y;
         float playerZ = actor.z;
 
         int distance = 2;
         double radYaw = Math.toRadians(yaw);
+        double radPitch = Math.toRadians(pitch);
         
         float forwardX = (float) (Math.sin(radYaw)) * distance;
         float forwardZ = (float) (-Math.cos(radYaw)) * distance;
+        float fowardY = (float) (-Math.sin(radPitch)) * distance +1;
 
         int blockX = (int) (playerX + forwardX);
-        int blockY = (int) (playerY) - 1;
+        int blockY = (int) (playerY + fowardY);
         int blockZ = (int) (playerZ + forwardZ);
 
         // ブロックを配置するロジックをここに追加

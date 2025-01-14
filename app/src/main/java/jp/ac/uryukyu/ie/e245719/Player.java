@@ -93,7 +93,7 @@ public class Player extends Mob {
             }
         }
         if (isMousePressed) {
-            this.action.placeBlockInDirection(yaw, "stone");
+            this.action.placeBlockInDirection(pitch, yaw, "stone");
         }
     }
 
