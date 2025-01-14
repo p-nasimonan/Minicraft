@@ -7,12 +7,18 @@
 
 ### LWJGLの厄介ポイント
 - macOSの場合jvmの引数に"-XstartOnFirstThread"をつけないといけない **(逆にwindowsはこの設定は消してください)**
-  - VScodeで実行する場合setting.jsonにこれを書き込むと解決できる。
+  - VScodeの開発環境で実行する場合.vscode内のjsonファイルを書き換える必要がある
+  - launch.json
+    ```.vscode/launch.json
+    "vmArgs": "-XstartOnFirstThread",
+    ```
+    setting.json
     ```.vscode/setting.json
         "java.test.config": {
         "vmArgs": ["-XstartOnFirstThread"]
     }
     ```
+  を追加したらテストも実行できるようになる
 
 
 ## クラス図を書いた(mermaid)
