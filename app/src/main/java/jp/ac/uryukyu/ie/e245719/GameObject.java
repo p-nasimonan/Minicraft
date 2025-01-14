@@ -58,7 +58,7 @@ public abstract class GameObject {
     
     //Setters
     public void setName(String name) {
-        if (name.length() < 1 || name.length() > 16) {
+        if (name.length() < 2 || name.length() > 16) {
             throw new IllegalArgumentException("名前は1文字以上16時未満で設定してください");
         }
         this.name = name;
