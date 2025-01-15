@@ -6,7 +6,9 @@ public class InterFace {
     private final long windowHandle;
     private float mouseX, mouseY;
     private boolean isKeyPressed = false;
-    private boolean isMousePressed = false;
+    private boolean MousePressed = false;
+    private boolean leftButtonPressed = false;
+    private boolean rightButtonPressed = false;
     private int pressedKey;
     private int pressedAction;
     private MouseInput mouseInput;
@@ -29,10 +31,14 @@ public class InterFace {
             ypos[0] = 600 - ypos[0];
             this.mouseX = (float) xpos[0];
             this.mouseY = (float) ypos[0];
-            if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && action == GLFW.GLFW_PRESS) {
-                this.isMousePressed = true;
+            if (action == GLFW.GLFW_PRESS) {
+                this.leftButtonPressed = (button == GLFW.GLFW_MOUSE_BUTTON_LEFT);
+                this.rightButtonPressed = (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+                this.MousePressed = (this.leftButtonPressed || this.rightButtonPressed);
             } else {
-                this.isMousePressed = false;
+                this.MousePressed = false;
+                this.leftButtonPressed = false;
+                this.rightButtonPressed = false;
             }
         });
 
@@ -80,8 +86,15 @@ public class InterFace {
         };
     }
     public boolean isMousePressed() {
-        return this.isMousePressed;
+        return this.MousePressed;
     }
+    public boolean isLeftButtonPressed() {
+        return this.leftButtonPressed;
+    }
+    public boolean isRightButtonPressed() {
+        return this.rightButtonPressed;
+    }
+
     public int getPressedKey() {
         return this.pressedKey;
     }

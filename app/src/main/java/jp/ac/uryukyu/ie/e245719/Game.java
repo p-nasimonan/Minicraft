@@ -188,7 +188,7 @@ public class Game {
             
             if (!cursorEnabled) {
                 player.update(); // カーソルが非表示の時だけプレイヤーの視点を更新
-                player.handleInput(interFace.getPressedKey(), interFace.getPressedAction(), interFace.getMouseX(), interFace.getMouseY(), interFace.isMousePressed());
+                player.handleInput(interFace);
             }
             
         }
@@ -233,7 +233,7 @@ public class Game {
             if (interFace.isKeyPressed("enter")) {
                 gamestart();
             }
-            if (startButton.isTouched(mouseX, mouseY) && interFace.isMousePressed()) {
+            if (startButton.isTouched(mouseX, mouseY) && interFace.isLeftButtonPressed()) {
                 gamestart();
             }
         }

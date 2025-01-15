@@ -79,9 +79,9 @@ public class Player extends Mob {
      * @param mY
      * @param isMousePressed
      */
-    public void handleInput(int key, int action, float mX, float mY, boolean isMousePressed) {
-        if (action == GLFW.GLFW_PRESS) {
-            switch (key) {
+    public void handleInput(InterFace interFace) {
+        if (interFace.isKeyPressed()) {
+            switch (interFace.getPressedKey()) {
                 case GLFW.GLFW_KEY_W -> this.action.move("forward", yaw);
                 case GLFW.GLFW_KEY_S -> this.action.move("backward", yaw);
                 case GLFW.GLFW_KEY_A -> this.action.move("left", yaw);
@@ -92,8 +92,11 @@ public class Player extends Mob {
                 case GLFW.GLFW_KEY_F3 -> debugInfo(); //トグルにしたい
             }
         }
-        if (isMousePressed) {
+        if (interFace.isLeftButtonPressed()) {
             this.action.placeBlockInDirection(pitch, yaw, "stone");
+        }
+        if (interFace.isRightButtonPressed()) {
+            this.action.breakBlockInDirection(pitch, yaw);
         }
     }
 

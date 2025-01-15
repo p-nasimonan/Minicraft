@@ -17,6 +17,8 @@ public abstract class GameObject {
     protected float vy;
     protected boolean showInfo;
     private static final float TERMINAL_VELOCITY = -0.5f;
+    private float[][] vertices;
+    
 
     public GameObject(String name, String id, float x, float y, float z, float width, float height, float depth) {
         this.name = name;
@@ -117,54 +119,14 @@ public abstract class GameObject {
         return collision;
     }
 
-    public void drawFace(String face) {
-        switch (face) {
-            case "front" -> {
-                glVertex3f(x, y, z);
-                glVertex3f(x + width, y, z);
-                glVertex3f(x + width, y + height, z);
-                glVertex3f(x, y + height, z);
-            }
-            case "back" -> {
-                glVertex3f(x, y, z + depth);
-                glVertex3f(x + width, y, z + depth);
-                glVertex3f(x + width, y + height, z + depth);
-                glVertex3f(x, y + height, z + depth);
-            }
-            case "left" -> {
-                glVertex3f(x, y, z);
-                glVertex3f(x, y, z + depth);
-                glVertex3f(x, y + height, z + depth);
-                glVertex3f(x, y + height, z);
-            }
-            case "right" -> {
-                glVertex3f(x + width, y, z);
-                glVertex3f(x + width, y, z + depth);
-                glVertex3f(x + width, y + height, z + depth);
-                glVertex3f(x + width, y + height, z);
-            }
-            case "top" -> {
-                glVertex3f(x, y + height, z);
-                glVertex3f(x + width, y + height, z);
-                glVertex3f(x + width, y + height, z + depth);
-                glVertex3f(x, y + height, z + depth);
-            }
-            case "bottom" -> {
-                glVertex3f(x, y, z);
-                glVertex3f(x + width, y, z);
-                glVertex3f(x + width, y, z + depth);
-                glVertex3f(x, y, z + depth);
-            }
-        }
-    }
+    //描画-----------------------------------------------------
 
-    public void drawEdges() {
-        glColor3f(0.0f, 0.0f, 0.0f); // 辺の色（黒）
-        glBegin(GL_LINES);
-        
-        // 辺の描画
-        // 各辺の始点と終点を定義
-        float[][] vertices = {
+    /**
+     * 指定された面を描画します
+     * @param face 描画する面"front", "back", "left", "right", "top", "bottom"
+     */
+    public void drawFace(String face) {
+        vertices = new float[][] {
             {x, y, z}, // 前面の左下
             {x + width, y, z}, // 前面の右下
             {x + width, y, z + depth}, // 背面の右下
@@ -174,7 +136,38 @@ public abstract class GameObject {
             {x + width, y + height, z + depth}, // 背面の右上
             {x, y + height, z + depth}, // 背面の左上
         };
+        int[][] faceIndices = getFaceIndices(face);
+        for (int[] indices : faceIndices) {
+            glVertex3f(vertices[indices[0]][0], vertices[indices[0]][1], vertices[indices[0]][2]);
+            glVertex3f(vertices[indices[1]][0], vertices[indices[1]][1], vertices[indices[1]][2]);
+            glVertex3f(vertices[indices[2]][0], vertices[indices[2]][1], vertices[indices[2]][2]);
+            glVertex3f(vertices[indices[3]][0], vertices[indices[3]][1], vertices[indices[3]][2]);
+        }
+    }
 
+    /**
+     * 指定された面の頂点インデックスを取得します
+     * @param face 面の名前 "front", "back", "left", "right", "top", "bottom"
+     * @return 面の頂点インデックス
+     */
+    private int[][] getFaceIndices(String face) {
+        return switch (face) {
+            case "front" -> new int[][]{{0, 1, 5, 4}};
+            case "back" -> new int[][]{{3, 2, 6, 7}};
+            case "left" -> new int[][]{{0, 3, 7, 4}};
+            case "right" -> new int[][]{{1, 2, 6, 5}};
+            case "top" -> new int[][]{{4, 5, 6, 7}};
+            case "bottom" -> new int[][]{{0, 1, 2, 3}};
+            default -> throw new IllegalArgumentException("Invalid face: " + face);
+        };
+    }
+
+    /**
+     * オブジェクトの辺を描画します
+     */
+    public void drawEdges() {
+        glColor3f(0.0f, 0.0f, 0.0f); // 辺の色（黒）
+        glBegin(GL_LINES);
         // 各辺を描画
         // 前面
         drawLine(vertices[0], vertices[1]); // 左下から右下
@@ -200,11 +193,18 @@ public abstract class GameObject {
         glEnd();
     }
 
+    /**
+     * 2点間に線を描画します
+     * @param start 線の始点
+     * @param end 線の終点
+     */
     private void drawLine(float[] start, float[] end) {
         glVertex3f(start[0], start[1], start[2]);
         glVertex3f(end[0], end[1], end[2]);
     }
 
+
+    //物理-----------------------------------------------------
     /**
      * 重力を適用します。
      * オブジェクトが地面に接触していない場合、垂直速度を更新し、
