@@ -31,8 +31,6 @@ public class PlayerTest {
         // OpenGLコンテキストを作成
         GLFW.glfwMakeContextCurrent(dummyWindow);
         GL.createCapabilities();
-        // テスト用のWorldを作成
-        world = new World();
 
         // テスト用のInterFaceを作成
         interFace = new InterFace(dummyWindow);

@@ -93,10 +93,11 @@ public class Player extends Mob {
             }
         }
         if (interFace.isLeftButtonPressed()) {
-            this.action.placeBlockInDirection(pitch, yaw, "stone");
+            this.action.replaceBlockInDirection(pitch, yaw, "stone");
         }
         if (interFace.isRightButtonPressed()) {
-            this.action.breakBlockInDirection(pitch, yaw);
+            //　 破壊する(空気に置き換える)
+            this.action.replaceBlockInDirection(pitch, yaw, "air");
         }
     }
 

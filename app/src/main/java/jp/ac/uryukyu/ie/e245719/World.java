@@ -1,29 +1,35 @@
 package jp.ac.uryukyu.ie.e245719;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class World {
-    private final List<Block> blocks;
-    private final List<Enemy> enemies;
+    private Block[][][] blocks;
+    private List<Mob> mobs;
+    private int width, height, depth;
+    private int originX, originY, originZ;
     private final static float G = -0.007f;
 
-    public World() {
-        blocks = new ArrayList<>();
-        enemies = new ArrayList<>();
-        generate();
-    }
-
-    public final void generate() {
-        // ワールドの生成ロジックをここに追加
-        // 地面を石ブロックとして追加
-        for (int x = -10; x < 10; x++) {
-            for (int z = -10; z < 10; z++) {
-                Block block = new Block("石ブロック", "stone", x * 1, -4, z * 1, 1, 1, 1);
-                blocks.add(block);
-            }
-        } 
-        // 必要に応じて他のブロックも追加
+    public World(int width, int height, int depth) {
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.originX = -width / 2;
+        this.originY = -height / 2;
+        this.originZ = -depth / 2;
+        blocks = new Block[width][height][depth];
+        // ブロックの初期化
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int z = 0; z < depth; z++) {
+                    if (y == originY - 4) { // 地面の高さを設定
+                        blocks[x][y][z] = new Block("石ブロック", "stone", x - originX, y - originY, z - originZ, 1, 1, 1);
+                    } else {
+                        blocks[x][y][z] = new Block("空気ブロック", "air", x - originX, y - originY, z - originZ, 1, 1, 1);
+                    }
+                }
+            
+           }
+        }
     }
 
     /**
@@ -31,44 +37,79 @@ public class World {
      * 敵、プレイヤー、ブロックの状態を一括で更新します。
      */
     public void update() {
-        for (Block block : blocks) {
-            block.update();
-        }
-    }
-
-    public void render() {
-        for (Block block : blocks) {
-            block.render();
-        }
-    }
-
-    // ゲームオブジェクトを操作するためのメソッド
-    public List<Enemy> getEnemies() {
-        return enemies;
-    }
-    public List<Block> getBlocks() {
-        return blocks;
-    }
-    public List<GameObject> getGameObjects() {
-        List<GameObject> gameObjects = new ArrayList<>();
-        gameObjects.addAll(blocks);
-        gameObjects.addAll(enemies);
-        return gameObjects;
-    }
-    public void addBlock(Block block) {
-        blocks.add(block);
-    }
-    public void replaceBlock(Block block) {
-        for (Block b : blocks) {
-            if (b.x == block.x && b.y == block.y && b.z == block.z) {
-                blocks.remove(b);
-                blocks.add(block);
-                break;
+        for (int x = 0; x < blocks.length; x++) {
+            for (int y = 0; y < blocks[0].length; y++) {
+                for (int z = 0; z < blocks[0][0].length; z++) {
+                    blocks[x][y][z].update();
+                }
             }
         }
     }
 
+    public void render() {
+        for (int x = 0; x < blocks.length; x++) {
+            for (int y = 0; y < blocks[0].length; y++) {
+                for (int z = 0; z < blocks[0][0].length; z++) {
+                    if (!blocks[x][y][z].id.equals("air")) {
+                        blocks[x][y][z].render();
+                    }
+                }
+            }
+        }
+    }
+
+    // ゲームオブジェクトを操作するためのメソッド
+    public Block[][][] getBlocks() {
+        return blocks;
+    }
+
+    public List<Mob> getMobs() {
+        return mobs;
+    }
+
+    public void replaceBlock(Block block) {
+        int x = (int) toBlockX(block.x);
+        int y = (int) toBlockY(block.y);
+        int z = (int) toBlockZ(block.z);
+        blocks[x][y][z] = block;
+    }
+
     public float getG() {
         return G;
+    }
+
+    public int getWidth(){return width;}
+    public int getHeight(){return height;}
+    public int getDepth(){return depth;}
+    public int getOriginX() {
+        return originX;
+    }
+    public int getOriginY() {
+        return originY;
+    }
+    public int getOriginZ() {
+        return originZ;
+    }
+
+    // ゲームの座標とブロックの座標を変換するためのメソッド
+    public int toBlockX(float x) {
+        if (x < originX) {
+            System.err.println("x座標がワールドの範囲外です。x: " + x);
+        }
+        return (int) (x - originX);
+    }
+
+    public int toBlockY(float y) {
+        if (y < originY) {
+            System.err.println("y座標がワールドの範囲外です。y: " + y);
+        }
+        return (int) (y - originY);
+    }
+
+    public int toBlockZ(float z) {
+        if (z < originZ) {
+            System.err.println("z座標がワールドの範囲外です。z: " + z);
+        }
+        return (int) (z - originZ);
     }
 }

@@ -90,8 +90,8 @@ public class Game {
 
 
         // ゲームオブジェクトを初期化
-        this.world = new World();
-        this.player = new Player(interFace, world, 0, 2, 0);
+        this.world = new World(100, 100, 100);
+        this.player = new Player(interFace, world, 0, world.getOriginY() + 5, 0);
 
         // FPS計測の初期化
         lastFpsTime = System.currentTimeMillis();

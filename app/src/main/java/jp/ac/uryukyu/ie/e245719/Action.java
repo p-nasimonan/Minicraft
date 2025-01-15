@@ -51,8 +51,9 @@ public class Action {
         float newY = actor.y + dy;
         float newZ = actor.z + dz;
 
-        if (!actor.checkCollision(newX, newY, newZ)) {
+        if (!actor.checkCollisionWithBlocks(newX, newY, newZ)) {
             actor.setPosition(newX, newY, newZ);
+            System.out.println("Moved to (" + newX + ", " + newY + ", " + newZ + ")");
         }
     }
 
@@ -88,54 +89,12 @@ public class Action {
     }
 
     /**
-     * 指定された位置にブロックを設置します
-     * @param x X座標
-     * @param y Y座標
-     * @param z Z座標
-     */
-    public void putBlock(int x, int y, int z) {
-        Block block = new Block("block", "stone", x, y, z, 1, 1, 1);
-        actor.world.addBlock(block);
-    }
-
-    /**
-     * 向いている方向から指定された距離だけ前方のブロックを返します
-     * @param pitch
-     * @param yaw
-     * 
-     */
-    public Block getBlockInDirection(float pitch, float yaw) {
-        float playerX = actor.x;
-        float playerY = actor.y;
-        float playerZ = actor.z;
-
-        int distance = 2;
-        double radYaw = Math.toRadians(yaw);
-        double radPitch = Math.toRadians(pitch);
-        
-        float forwardX = (float) (Math.sin(radYaw)) * distance;
-        float forwardZ = (float) (-Math.cos(radYaw)) * distance;
-        float fowardY = (float) (-Math.sin(radPitch)) * distance +1;
-
-        int blockX = (int) (playerX + forwardX);
-        int blockY = (int) (playerY + fowardY);
-        int blockZ = (int) (playerZ + forwardZ);
-
-        for (Block block : world.getBlocks()) {
-            if (block.x == blockX && block.y == blockY && block.z == blockZ) {
-                return block;
-            }
-        }
-        return null;
-    }
-
-    /**
      * プレイヤーの向いている方向にブロックを設置します
      * @param pitch プレイヤーの向いている方向（度数）
      * @param yaw プレイヤーの向いている方向（度数）
      * @param blockType ブロックの種類
      */
-    public void placeBlockInDirection(float pitch, float yaw, String blockType) {
+    public void replaceBlockInDirection(float pitch, float yaw, String blockType) {
         float playerX = actor.x;
         float playerY = actor.y;
         float playerZ = actor.z;
@@ -154,38 +113,6 @@ public class Action {
 
         // ブロックを配置するロジックをここに追加
         Block block = new Block("block", "stone", blockX, blockY, blockZ, 1, 1, 1);
-       this.world.addBlock(block);
-    }
-
-    /**
-     * プレイヤーの向いている方向のブロックを破壊します
-     * @param pitch プレイヤーの向いている方向（度数）
-     * @param yaw プレイヤーの向いている方向（度数）
-     */
-    public void breakBlockInDirection(float pitch, float yaw) {
-        float playerX = actor.x;
-        float playerY = actor.y;
-        float playerZ = actor.z;
-
-        int distance = 2;
-        double radYaw = Math.toRadians(yaw);
-        double radPitch = Math.toRadians(pitch);
-        
-        float forwardX = (float) (Math.sin(radYaw)) * distance;
-        float forwardZ = (float) (-Math.cos(radYaw)) * distance;
-        float fowardY = (float) (-Math.sin(radPitch)) * distance +1;
-
-        int blockX = (int) (playerX + forwardX);
-        int blockY = (int) (playerY + fowardY);
-        int blockZ = (int) (playerZ + forwardZ);
-
-        // ブロックを破壊するロジックをここに追加
-        for (Block block : world.getBlocks()) {
-            if (block.x == blockX && block.y == blockY && block.z == blockZ) {
-                world.getBlocks().remove(block);
-                world.getGameObjects().remove(block);
-                break;
-            }
-        }
+       this.world.replaceBlock(block);
     }
 }

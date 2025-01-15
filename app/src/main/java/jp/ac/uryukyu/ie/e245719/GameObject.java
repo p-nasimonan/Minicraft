@@ -76,49 +76,6 @@ public abstract class GameObject {
         }
     }
 
-    /**
-     * オブジェクトのColliderを設定します
-     * @param collider オブジェクトのCollider
-     */
-    protected void setCollider(Collider collider) {
-        this.collider = collider;
-    }
-
-    /**
-     * 指定された位置での衝突判定を行います
-     * @param newX 新しいX座標
-     * @param newY 新しいY座標
-     * @param newZ 新しいZ座標
-     * @return 衝突する場合はtrue
-     */
-    public boolean checkCollision(float newX, float newY, float newZ) {
-        collider.setPosition(newX, newY, newZ);
-        boolean collision = false;
-        
-        for (GameObject gameobject : world.getGameObjects()) {
-            if (collider.intersects(gameobject.getCollider())) {
-                if (showInfo == true) {
-                    System.out.println("Collision detected with block at: (" + 
-                        gameobject.x + ", " + gameobject.y + ", " + gameobject.z + ")");
-                }
-                collision = true;
-                // 下方向への移動で衝突した場合、地面に着地したとみなす
-                if (newY < y) {
-                    onGround = true;
-                }
-                break;
-            }
-        }
-        
-        // 衝突がない場合は空中にいる
-        if (!collision && newY < y) {
-            onGround = false;
-        }
-        
-        collider.setPosition(x, y, z);
-        return collision;
-    }
-
     //描画-----------------------------------------------------
 
     /**
@@ -205,6 +162,92 @@ public abstract class GameObject {
 
 
     //物理-----------------------------------------------------
+
+
+    /**
+     * オブジェクトのColliderを設定します
+     * @param collider オブジェクトのCollider
+     */
+    protected void setCollider(Collider collider) {
+        this.collider = collider;
+    }
+
+    /**
+     * 指定された位置での衝突判定を行います
+     * @param newX 新しいX座標
+     * @param newY 新しいY座標
+     * @param newZ 新しいZ座標
+     * @return 衝突する場合はtrue
+     */
+    public boolean checkCollision(float newX, float newY, float newZ) {
+        collider.setPosition(newX, newY, newZ);
+        boolean collision = false;
+        
+        for (GameObject gameobject : world.getMobs()) {
+            if (collider.intersects(gameobject.getCollider())) {
+                if (showInfo) {
+                    System.out.println("Collision detected with block at: (" + 
+                        gameobject.x + ", " + gameobject.y + ", " + gameobject.z + ")");
+                }
+                collision = true;
+                // 下方向への移動で衝突した場合、地面に着地したとみなす
+                if (newY < y) {
+                    onGround = true;
+                }
+                break;
+            }
+        }
+        
+        // 衝突がない場合は空中にいる
+        if (!collision && newY < y) {
+            onGround = false;
+        }
+        
+        collider.setPosition(x, y, z);
+        return collision;
+    }
+
+    /**
+     * 指定された位置でのブロックとの衝突判定を行います
+     * @param newX 新しいX座標
+     * @param newY 新しいY座標
+     * @param newZ 新しいZ座標
+     * @return 衝突する場合はtrue
+     */
+    public boolean checkCollisionWithBlocks(float newX, float newY, float newZ) {
+        collider.setPosition(newX, newY, newZ);
+        boolean collision = false;
+    
+        int blockX = world.toBlockX(newX);
+        int blockY = world.toBlockY(newY);
+        int blockZ = world.toBlockZ(newZ);
+    
+        // 範囲チェックを追加
+        if (blockX >= 0 && blockX < world.getWidth() &&
+            blockY >= 0 && blockY < world.getHeight() &&
+            blockZ >= 0 && blockZ < world.getDepth()) {
+    
+            Block targetBlock = world.getBlocks()[blockX][blockY][blockZ];
+            if (collider.intersects(targetBlock.getCollider())) {
+                if (!targetBlock.id.equals("air")) {
+                    collision = true;
+                    if (newY < y) {
+                        onGround = true;
+                    }
+                }
+            }
+        }
+    
+        // 衝突がない場合は空中にいる
+        if (!collision && newY < y) {
+            onGround = false;
+        }
+    
+        collider.setPosition(x, y, z);
+        return collision;
+    }
+    
+
     /**
      * 重力を適用します。
      * オブジェクトが地面に接触していない場合、垂直速度を更新し、
@@ -220,7 +263,7 @@ public abstract class GameObject {
             
             float newY = y + vy;
             
-            if (!checkCollision(x, newY, z)) {
+            if (!checkCollisionWithBlocks(x, newY, z)) {
                 y = newY;
                 collider.setPosition(x, y, z);
             } else {
@@ -231,7 +274,7 @@ public abstract class GameObject {
         else {
             vy += world.getG();
             float newY = y + vy;
-            if(!checkCollision(x, newY, z)){
+            if(!checkCollisionWithBlocks(x, newY, z)){
                 onGround = false;
             }
         }

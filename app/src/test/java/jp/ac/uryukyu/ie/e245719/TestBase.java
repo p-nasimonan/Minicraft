@@ -29,6 +29,6 @@ public class TestBase {
         GL.createCapabilities();
 
         // テスト用のWorldを作成
-        world = new World();
+        world = new World(10, 10, 10);
     }
 } 
