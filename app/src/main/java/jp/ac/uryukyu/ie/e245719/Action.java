@@ -53,7 +53,6 @@ public class Action {
 
         if (!actor.checkCollisionWithBlocks(newX, newY, newZ)) {
             actor.setPosition(newX, newY, newZ);
-            System.out.println("Moved to (" + newX + ", " + newY + ", " + newZ + ")");
         }
     }
 
@@ -112,7 +111,7 @@ public class Action {
         int blockZ = (int) (playerZ + forwardZ);
 
         // ブロックを配置するロジックをここに追加
-        Block block = new Block("block", "stone", blockX, blockY, blockZ, 1, 1, 1);
+        Block block = new Block(world, "block", "stone", blockX, blockY, blockZ, 1, 1, 1);
        this.world.replaceBlock(block);
     }
 }

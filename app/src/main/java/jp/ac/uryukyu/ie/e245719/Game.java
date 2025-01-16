@@ -17,6 +17,10 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glViewport;
 import org.lwjgl.system.MemoryUtil;
 
+
+/*
+ * ゲームの中心となるクラス。ウィンドウを作成し、ゲームの初期化、更新、描画を行う。
+ */
 public class Game {
     private long mainWindow;
     private World world;
@@ -84,19 +88,19 @@ public class Game {
     private void gameInit() {
         // スタートボタンを初期化
         this.startButton = new Button(350, 250, 100, 50, "Start");
-
+    
         // インターフェースを初期化
         this.interFace = new InterFace(mainWindow);
-
-
+    
         // ゲームオブジェクトを初期化
-        this.world = new World(100, 100, 100);
-        this.player = new Player(interFace, world, 0, world.getOriginY() + 5, 0);
-
+        this.world = new World(64, 50, 64);
+        this.player = new Player(interFace, world, 0, 5, 0);
+    
         // FPS計測の初期化
         lastFpsTime = System.currentTimeMillis();
         fps = 0;
         frames = 0;
+        
     }
 
     private void setupOrtho() {

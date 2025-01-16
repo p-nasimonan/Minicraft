@@ -53,7 +53,7 @@ public class PlayerTest {
     @Test
     public void 衝突テスト() {
         Player testPlayer = new Player(interFace, world, 0, 2, 0);
-        Block testBlock = new Block("testblock", "stone", 0, 2, 0, 1, 1, 1);
+        Block testBlock = new Block(world, "testblock", "stone", 0, 2, 0, 1, 1, 1);
         Collider collider = testBlock.getCollider();
         
         Assertions.assertThat(collider)

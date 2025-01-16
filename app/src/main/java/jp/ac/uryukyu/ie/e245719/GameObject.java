@@ -20,7 +20,7 @@ public abstract class GameObject {
     private float[][] vertices;
     
 
-    public GameObject(String name, String id, float x, float y, float z, float width, float height, float depth) {
+    public GameObject(World world, String name, String id, float x, float y, float z, float width, float height, float depth) {
         this.name = name;
         this.id = id;
         this.x = x;
@@ -33,6 +33,17 @@ public abstract class GameObject {
         this.vy = 0.0f;
         this.showInfo = false;
         this.collider = new Collider(x, y, z, width, height, depth);
+        this.world = world;
+        this.vertices = new float[][] {
+            {x, y, z}, // 前面の左下
+            {x + width, y, z}, // 前面の右下
+            {x + width, y, z + depth}, // 背面の右下
+            {x, y, z + depth}, // 背面の左下
+            {x, y + height, z}, // 前面の左上
+            {x + width, y + height, z}, // 前面の右上
+            {x + width, y + height, z + depth}, // 背面の右上
+            {x, y + height, z + depth}, // 背面の左上
+        };
     }
 
     public abstract void update();
@@ -83,16 +94,6 @@ public abstract class GameObject {
      * @param face 描画する面"front", "back", "left", "right", "top", "bottom"
      */
     public void drawFace(String face) {
-        vertices = new float[][] {
-            {x, y, z}, // 前面の左下
-            {x + width, y, z}, // 前面の右下
-            {x + width, y, z + depth}, // 背面の右下
-            {x, y, z + depth}, // 背面の左下
-            {x, y + height, z}, // 前面の左上
-            {x + width, y + height, z}, // 前面の右上
-            {x + width, y + height, z + depth}, // 背面の右上
-            {x, y + height, z + depth}, // 背面の左上
-        };
         int[][] faceIndices = getFaceIndices(face);
         for (int[] indices : faceIndices) {
             glVertex3f(vertices[indices[0]][0], vertices[indices[0]][1], vertices[indices[0]][2]);
@@ -171,42 +172,6 @@ public abstract class GameObject {
     protected void setCollider(Collider collider) {
         this.collider = collider;
     }
-
-    /**
-     * 指定された位置での衝突判定を行います
-     * @param newX 新しいX座標
-     * @param newY 新しいY座標
-     * @param newZ 新しいZ座標
-     * @return 衝突する場合はtrue
-     */
-    public boolean checkCollision(float newX, float newY, float newZ) {
-        collider.setPosition(newX, newY, newZ);
-        boolean collision = false;
-        
-        for (GameObject gameobject : world.getMobs()) {
-            if (collider.intersects(gameobject.getCollider())) {
-                if (showInfo) {
-                    System.out.println("Collision detected with block at: (" + 
-                        gameobject.x + ", " + gameobject.y + ", " + gameobject.z + ")");
-                }
-                collision = true;
-                // 下方向への移動で衝突した場合、地面に着地したとみなす
-                if (newY < y) {
-                    onGround = true;
-                }
-                break;
-            }
-        }
-        
-        // 衝突がない場合は空中にいる
-        if (!collision && newY < y) {
-            onGround = false;
-        }
-        
-        collider.setPosition(x, y, z);
-        return collision;
-    }
-
     /**
      * 指定された位置でのブロックとの衝突判定を行います
      * @param newX 新しいX座標
@@ -217,16 +182,16 @@ public abstract class GameObject {
     public boolean checkCollisionWithBlocks(float newX, float newY, float newZ) {
         collider.setPosition(newX, newY, newZ);
         boolean collision = false;
-    
+
         int blockX = world.toBlockX(newX);
         int blockY = world.toBlockY(newY);
         int blockZ = world.toBlockZ(newZ);
-    
+
         // 範囲チェックを追加
         if (blockX >= 0 && blockX < world.getWidth() &&
             blockY >= 0 && blockY < world.getHeight() &&
             blockZ >= 0 && blockZ < world.getDepth()) {
-    
+
             Block targetBlock = world.getBlocks()[blockX][blockY][blockZ];
             if (collider.intersects(targetBlock.getCollider())) {
                 if (!targetBlock.id.equals("air")) {
@@ -237,16 +202,15 @@ public abstract class GameObject {
                 }
             }
         }
-    
+
         // 衝突がない場合は空中にいる
         if (!collision && newY < y) {
             onGround = false;
         }
-    
+
         collider.setPosition(x, y, z);
         return collision;
     }
-    
 
     /**
      * 重力を適用します。

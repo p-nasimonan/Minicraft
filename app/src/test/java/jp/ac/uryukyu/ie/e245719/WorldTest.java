@@ -14,7 +14,7 @@ class WorldTest extends TestBase {
 
     @Test
     void ブロックを置き換えられる() {
-        Block block = new Block("testBlock", "stone", 0, 0, 0, 1, 1, 1);
+        Block block = new Block(world, "testBlock", "stone", 0, 0, 0, 1, 1, 1);
         world.replaceBlock(block);
         assertTrue(world.getBlocks()[0][0][0].id.equals("stone"));
     }

@@ -14,17 +14,17 @@ public class World {
         this.height = height;
         this.depth = depth;
         this.originX = -width / 2;
-        this.originY = -height / 2;
+        this.originY = 0;
         this.originZ = -depth / 2;
         blocks = new Block[width][height][depth];
         // ブロックの初期化
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < depth; z++) {
-                    if (y == originY - 4) { // 地面の高さを設定
-                        blocks[x][y][z] = new Block("石ブロック", "stone", x - originX, y - originY, z - originZ, 1, 1, 1);
+                    if (y < 1) { // 地面の高さを設定
+                        blocks[x][y][z] = new Block(this, "草ブロック", "grass", x + originX, y + originY, z + originZ, 1, 1, 1);
                     } else {
-                        blocks[x][y][z] = new Block("空気ブロック", "air", x - originX, y - originY, z - originZ, 1, 1, 1);
+                        blocks[x][y][z] = new Block(this, "空気ブロック", "air", x + originX, y + originY, z + originZ, 1, 1, 1);
                     }
                 }
             
@@ -50,7 +50,7 @@ public class World {
         for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[0].length; y++) {
                 for (int z = 0; z < blocks[0][0].length; z++) {
-                    if (!blocks[x][y][z].id.equals("air")) {
+                    if (!blocks[x][y][z].isAir()) {
                         blocks[x][y][z].render();
                     }
                 }
@@ -93,23 +93,36 @@ public class World {
 
     // ゲームの座標とブロックの座標を変換するためのメソッド
     public int toBlockX(float x) {
-        if (x < originX) {
-            System.err.println("x座標がワールドの範囲外です。x: " + x);
+        int blockX = (int) (x - originX);
+        if (blockX < 0) {
+            blockX = 0;
+        } else if (blockX >= width) {
+            blockX = width - 1;
         }
-        return (int) (x - originX);
+        return blockX;
     }
 
     public int toBlockY(float y) {
-        if (y < originY) {
-            System.err.println("y座標がワールドの範囲外です。y: " + y);
+        int blockY = (int) (y - originY);
+        if (blockY < 0) {
+            blockY = 0;
+        } else if (blockY >= height) {
+            blockY = height - 1;
         }
-        return (int) (y - originY);
+        return blockY;
     }
 
     public int toBlockZ(float z) {
-        if (z < originZ) {
-            System.err.println("z座標がワールドの範囲外です。z: " + z);
+        int blockZ = (int) (z - originZ);
+        if (blockZ < 0) {
+            blockZ = 0;
+        } else if (blockZ >= depth) {
+            blockZ = depth - 1;
         }
-        return (int) (z - originZ);
+        return blockZ;
+    }
+
+    public Block getBlockAt(float x, float y, float z) {
+        return blocks[toBlockX(x)][toBlockY(y)][toBlockZ(z)];
     }
 }

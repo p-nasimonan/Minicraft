@@ -8,7 +8,7 @@ class BlockTest extends TestBase {
 
     @Test
     void ブロックが正しく初期化される() {
-        Block block = new Block("testBlock", "stone", 0, 0, 0, 1, 1, 1);
+        Block block = new Block(world, "testBlock", "stone", 0, 0, 0, 1, 1, 1);
         assertEquals("testBlock", block.getName());
         assertEquals("stone", block.id);
         assertEquals(0, block.x);
@@ -18,7 +18,7 @@ class BlockTest extends TestBase {
 
     @Test
     void 描画処理が例外を発生させない() {
-        Block block = new Block("testBlock", "stone", 0, 0, 0, 1, 1, 1);
+        Block block = new Block(world, "testBlock", "stone", 0, 0, 0, 1, 1, 1);
         assertDoesNotThrow(block::render);
     }
 }

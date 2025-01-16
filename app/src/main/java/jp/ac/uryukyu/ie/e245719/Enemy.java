@@ -1,8 +1,8 @@
 package jp.ac.uryukyu.ie.e245719;
 
 public class Enemy extends Mob {
-    public Enemy(String name, String id, int attack, int x, int y, int z, int hp, int width, int height, int depth) {
-        super(name, id, attack, x, y, z, hp, width, height, depth);
+    public Enemy(World world, String name, String id, int attack, int x, int y, int z, int hp, int width, int height, int depth) {
+        super(world, name, id, attack, x, y, z, hp, width, height, depth);
     }
 
     @Override
@@ -20,9 +20,4 @@ public class Enemy extends Mob {
         // パトロールのロジックをここに追加
     }
 
-    @Override
-    public boolean checkCollision(float newX, float newY, float newZ) {
-        // 敵の衝突判定ロジックをここに追加
-        return false;
-    }
 }

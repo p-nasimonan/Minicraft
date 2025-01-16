@@ -5,8 +5,8 @@ public abstract class Mob extends GameObject {
     private int hp;
     public Action action;
 
-    public Mob(String name, String id, int attack, float x, float y, float z, int hp, float width, float height, float depth) {
-        super(name, id, x, y, z, width, height, depth);
+    public Mob(World world, String name, String id, int attack, float x, float y, float z, int hp, float width, float height, float depth) {
+        super(world, name, id, x, y, z, width, height, depth);
         this.attack = attack;
         this.hp = hp;
         this.action = new Action(this, world);

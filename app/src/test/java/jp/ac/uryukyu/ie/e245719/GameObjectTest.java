@@ -18,8 +18,8 @@ class TestGameObject extends GameObject {
      * @param height 高さ
      * @param depth 奥行き
      */
-    public TestGameObject(String name, String type, float x, float y, float z, float width, float height, float depth) {
-        super(name, type, x, y, z, width, height, depth);
+    public TestGameObject(World world, String name, String type, float x, float y, float z, float width, float height, float depth) {
+        super(world, name, type, x, y, z, width, height, depth);
     }
 
     @Override
@@ -33,11 +33,11 @@ class TestGameObject extends GameObject {
     }
 }
 
-public class GameObjectTest {
+public class GameObjectTest extends TestBase {
 
     @Test
     public void 初期化テスト() {
-        TestGameObject testObject = new TestGameObject("test", "test", 0, 0, 0, 1, 1, 1);
+        TestGameObject testObject = new TestGameObject(world,"test", "test", 0, 0, 0, 1, 1, 1);
         
         Assertions.assertThat(testObject)
             .satisfies(obj -> {
@@ -54,7 +54,7 @@ public class GameObjectTest {
 
     @Test
     public void コライダー取得テスト() {
-        TestGameObject testObject = new TestGameObject("test", "test", 0, 0, 0, 1, 1, 1);
+        TestGameObject testObject = new TestGameObject(world,"test", "test", 0, 0, 0, 1, 1, 1);
         Collider collider = testObject.getCollider();
         
         Assertions.assertThat(collider)
@@ -70,14 +70,14 @@ public class GameObjectTest {
 
     @Test
     public void 衝突検出テスト() {
-        TestGameObject obj1 = new TestGameObject("obj1", "test", 0, 0, 0, 1, 1, 1);
-        TestGameObject obj2 = new TestGameObject("obj2", "test", 0.5f, 0, 0, 1, 1, 1);
+        TestGameObject obj1 = new TestGameObject(world,"obj1", "test", 0, 0, 0, 1, 1, 1);
+        TestGameObject obj2 = new TestGameObject(world,"obj2", "test", 0.5f, 0, 0, 1, 1, 1);
         
         Assertions.assertThat(obj1.getCollider().intersects(obj2.getCollider()))
             .as("重なっているオブジェクトは衝突を検出するべきです")
             .isTrue();
         
-        TestGameObject obj3 = new TestGameObject("obj3", "test", 2, 0, 0, 1, 1, 1);
+        TestGameObject obj3 = new TestGameObject(world,"obj3", "test", 2, 0, 0, 1, 1, 1);
         
         Assertions.assertThat(obj1.getCollider().intersects(obj3.getCollider()))
             .as("重なっていないオブジェクトは衝突を検出しないべきです")
@@ -86,9 +86,9 @@ public class GameObjectTest {
 
     @Test
     public void デバッグ情報テスト() {
-        TestGameObject testObject = new TestGameObject("test", "test", 1, 2, 3, 1, 1, 1);
+        TestGameObject testObject = new TestGameObject(world,"test", "test", 1, 2, 3, 1, 1, 1);
         String collisionInfo = testObject.checkCollisionInfo(
-            new TestGameObject("other", "test", 5, 5, 5, 1, 1, 1)
+            new TestGameObject(world,"other", "test", 5, 5, 5, 1, 1, 1)
         );
         
         Assertions.assertThat(collisionInfo)
@@ -100,8 +100,8 @@ public class GameObjectTest {
 
     @Test
     public void 衝突判定が正しく機能する() {
-        TestGameObject obj1 = new TestGameObject("obj1", "test", 0, 0, 0, 1, 1, 1);
-        TestGameObject obj2 = new TestGameObject("obj2", "test", 0.5f, 0.5f, 0.5f, 1, 1, 1);
+        TestGameObject obj1 = new TestGameObject(world,"obj1", "test", 0, 0, 0, 1, 1, 1);
+        TestGameObject obj2 = new TestGameObject(world,"obj2", "test", 0.5f, 0.5f, 0.5f, 1, 1, 1);
         Assertions.assertThat(obj1.getCollider().intersects(obj2.getCollider()))
             .as("重なっているオブジェクトは衝突を検出するべきです")
             .isTrue();
@@ -110,7 +110,7 @@ public class GameObjectTest {
     @Test
     public void 間違った名前に変更した場合正常に例外が起こる() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            TestGameObject obj1 = new TestGameObject("testBlock", "stone", 0, 0, 0, 1, 1, 1);
+            TestGameObject obj1 = new TestGameObject(world,"testBlock", "stone", 0, 0, 0, 1, 1, 1);
             obj1.setName("a");
         });
         assertNotNull(exception);

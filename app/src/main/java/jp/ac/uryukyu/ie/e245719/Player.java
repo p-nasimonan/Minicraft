@@ -27,13 +27,13 @@ public class Player extends Mob {
      * @param world Worldへの参照
      */
     public Player(InterFace interFace, World world, float x, float y, float z) {
-        super("player", "Player", 10, x, y, z, 100, 1, 2, 1);
+        super(world, "player", "Player", 10, x, y, z, 100, 1, 4, 1);
         this.world = world;
         inventory = new ArrayList<>();
         // プレイヤーの初期位置を設定
-        this.x = 0.0f;
-        this.y = 2.0f; 
-        this.z = 0.0f;
+        this.x = x;
+        this.y = y; 
+        this.z = z;
 
         this.pitch = 0.0f;
         this.yaw = 0.0f;
