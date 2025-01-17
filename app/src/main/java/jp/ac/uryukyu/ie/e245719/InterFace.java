@@ -1,7 +1,9 @@
 package jp.ac.uryukyu.ie.e245719;
 
 import org.lwjgl.glfw.GLFW;
-
+/**
+ * キーボードとマウスの入力を管理するクラス
+ */
 public class InterFace {
     private final long windowHandle;
     private float mouseX, mouseY;
@@ -13,14 +15,19 @@ public class InterFace {
     private int pressedAction;
     private MouseInput mouseInput;
 
-
+    /**
+     * インターフェースを初期化します
+     * @param windowHandle ウィンドウハンドル
+     */
     public InterFace(long windowHandle) {
         this.windowHandle = windowHandle;
         this.mouseInput = new MouseInput(windowHandle);
         setup();
 
     }
-    
+    /**
+     * キーボードとマウスのコールバックを設定します
+     */
     private void setup() {
         // マウスボタンのコールバックを設定
         GLFW.glfwSetMouseButtonCallback(windowHandle, (window, button, action, mods) -> {
@@ -54,6 +61,9 @@ public class InterFace {
         });
     }
 
+    /**
+     * キーボードとマウスの状態を更新します
+     */
     public void update() {
         // キーボードの状態を更新
         GLFW.glfwPollEvents();
@@ -67,6 +77,8 @@ public class InterFace {
         this.mouseY = (float) ypos[0];
     }
 
+
+    // アクセサメソッド-----------------------------------------------------
     public float getMouseX() {
         return this.mouseX;
     }
@@ -74,9 +86,19 @@ public class InterFace {
         return this.mouseY;
     }
 
+    /*
+     * キーボードが押されているかを取得します
+     * @return キーボードが押されている場合はtrue
+     */
     public boolean isKeyPressed() {
         return this.isKeyPressed;
     }
+
+    /**
+     * 指定されたキーが押されているかを取得します
+     * @param key キー
+     * @return キーが押されている場合はtrue
+     */
     public boolean isKeyPressed(String key) {
         return switch (key) {
             case "enter" -> GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_ENTER) == GLFW.GLFW_PRESS;
@@ -85,26 +107,54 @@ public class InterFace {
             default -> false;
         };
     }
+
+    /**
+     * 何かマウスが押されているかを取得します
+     * @return マウスが押されている場合はtrue
+     */
     public boolean isMousePressed() {
         return this.MousePressed;
     }
+    /**
+     * 左クリックが押されているかを取得します
+     * @return 左クリックが押されている場合はtrue
+     */
     public boolean isLeftButtonPressed() {
         return this.leftButtonPressed;
     }
+    /**
+     * 右クリックが押されているかを取得します
+     * @return 右クリックが押されている場合はtrue
+     */
     public boolean isRightButtonPressed() {
         return this.rightButtonPressed;
     }
-
+    /**
+     * 押されたキーを取得します
+     * @return 押されたキー
+     */
     public int getPressedKey() {
         return this.pressedKey;
     }
+    /**
+     * 押されたアクションを取得します
+     * @return 押されたアクション
+     */
     public int getPressedAction() {
         return this.pressedAction;
     }
     
+    /**
+     * マウス入力を設定します
+     * @param mouseInput マウス入力
+     */
     public void setMouseInput(MouseInput mouseInput) {
         this.mouseInput = mouseInput;
     }
+    /**
+     * マウス入力を取得します
+     * @return マウス入力
+     */
     public MouseInput getMouseInput() {
         return this.mouseInput;
     }

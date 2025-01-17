@@ -34,6 +34,9 @@ public class Game {
     private int fps;          // 現在のFPS
     private int frames;       // フレームカウンター
 
+    /**
+     * ゲームを開始します
+     */
     public void start() {
         this.mainWindow = createWindow();
         gameInit();
@@ -41,6 +44,10 @@ public class Game {
         cleanup();
     }
 
+    /**
+     * ウィンドウを作成します
+     * @return ウィンドウハンドル
+     */
     public long createWindow() {
         long win;
         // エラーコールバックを設定
@@ -85,6 +92,10 @@ public class Game {
         return win;
     }
 
+    /**
+     * ゲームの初期化を行います
+     * 描画されるオブジェクトやインターフェースを初期化します 
+     */
     private void gameInit() {
         // スタートボタンを初期化
         this.startButton = new Button(350, 250, 100, 50, "Start");
@@ -103,6 +114,9 @@ public class Game {
         
     }
 
+    /**
+     * ウィンドウの座標系を設定します
+     */
     private void setupOrtho() {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -111,6 +125,11 @@ public class Game {
         glLoadIdentity();
     }
 
+    /**
+     * ウィンドウの座標系を更新します
+     * @param width ウィンドウの幅
+     * @param height ウィンドウの高さ
+     */
     private void updateProjection(int width, int height) {
         float aspectRatio = (float) width / height;
         
@@ -135,6 +154,9 @@ public class Game {
         glLoadIdentity();
     }
 
+    /*
+     * カメラをセットアップする
+     */
     private void setupCamera() {
         int[] width = new int[1];
         int[] height = new int[1];
@@ -142,6 +164,11 @@ public class Game {
         updateProjection(width[0], height[0]);
     }
 
+    /**
+     * ゲームループを開始します
+     * FPSを計測し、ゲームの更新と描画を行います
+     * ウィンドウが閉じられるまでこの処理が続きます
+     */
     private void loop() {
         // ゲームループのタイミング制御用
         double secsPerUpdate = 1.0 / 60.0;
@@ -179,6 +206,9 @@ public class Game {
         }
     }
 
+    /**
+     * ゲームの状態を更新します
+     */
     private void update() {
         // インターフェースの状態を更新
         interFace.update();
@@ -195,6 +225,9 @@ public class Game {
         }
     }
 
+    /**
+     * ゲームを描画します。WorldとPlayerを描画します
+     */
     private void render() {
         // フレームバッファをクリア
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -220,6 +253,9 @@ public class Game {
         }
     }
 
+    /**
+     * キーボード入力を処理します
+     */
     private void handleInput() {
         if(gameStarted) {
             if (interFace.isKeyPressed("esc")) {
@@ -266,6 +302,9 @@ public class Game {
     }
 
 
+    /**
+     * ゲームを開始します
+     */
     private void gamestart() {
         gameStarted = true;
         setupCamera();
@@ -276,6 +315,9 @@ public class Game {
         GLFW.glfwSetCursorPos(mainWindow, 400, 300);
     }
 
+    /**
+     * ゲームの終了処理を行います
+     */
     public void cleanup() {
         // ウィンドウのコールバックを解放し、ウィンドウを破棄
         GLFW.glfwSetWindowShouldClose(mainWindow, true);
