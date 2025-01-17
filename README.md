@@ -2,7 +2,8 @@
 **プログラミングの課題で好きな作品を作るらしいのでJAVAといえばマインクラフトだと思い、それっぽいのを作ろうとした**
 
  オブジェクト指向のいい練習にもなるだろうし...
-![スクリーンショット 2025-01-17 195034](https://github.com/user-attachments/assets/74fc0f29-0b02-483c-b5be-ae96c6f3990f)
+![Minicraftv1 01](https://github.com/user-attachments/assets/59e83d2a-3233-4a95-b995-a53b3de4eb92)
+
 - 画像：最新版のワールドの画面
 
 ### LWJGLの厄介ポイント
