@@ -95,13 +95,11 @@ public abstract class GameObject {
      * @param face 描画する面"front", "back", "left", "right", "top", "bottom"
      */
     public void drawFace(String face) {
-        int[][] faceIndices = getFaceIndices(face);
-        for (int[] indices : faceIndices) {
-            glVertex3f(vertices[indices[0]][0], vertices[indices[0]][1], vertices[indices[0]][2]);
-            glVertex3f(vertices[indices[1]][0], vertices[indices[1]][1], vertices[indices[1]][2]);
-            glVertex3f(vertices[indices[2]][0], vertices[indices[2]][1], vertices[indices[2]][2]);
-            glVertex3f(vertices[indices[3]][0], vertices[indices[3]][1], vertices[indices[3]][2]);
-        }
+        int[] indices = getFaceIndices(face);
+        glVertex3f(vertices[indices[0]][0], vertices[indices[0]][1], vertices[indices[0]][2]);
+        glVertex3f(vertices[indices[1]][0], vertices[indices[1]][1], vertices[indices[1]][2]);
+        glVertex3f(vertices[indices[2]][0], vertices[indices[2]][1], vertices[indices[2]][2]);
+        glVertex3f(vertices[indices[3]][0], vertices[indices[3]][1], vertices[indices[3]][2]);
     }
 
     /**
@@ -111,15 +109,13 @@ public abstract class GameObject {
      * @param bottomColor 面の下部の色(r,g,b)
      */
     public void drawFace(String face, float[] topColor, float[] bottomColor) {
-        int[][] indices = getFaceIndices(face);
-        for (int[] index : indices) {
-            glColor3f(bottomColor[0], bottomColor[1], bottomColor[2]);
-            glVertex3f(vertices[index[0]][0], vertices[index[0]][1], vertices[index[0]][2]);
-            glVertex3f(vertices[index[1]][0], vertices[index[1]][1], vertices[index[1]][2]);
-            glColor3f(topColor[0], topColor[1], topColor[2]);
-            glVertex3f(vertices[index[2]][0], vertices[index[2]][1], vertices[index[2]][2]);
-            glVertex3f(vertices[index[3]][0], vertices[index[3]][1], vertices[index[3]][2]);
-        }
+        int[] index = getFaceIndices(face);
+        glColor3f(bottomColor[0], bottomColor[1], bottomColor[2]);
+        glVertex3f(vertices[index[0]][0], vertices[index[0]][1], vertices[index[0]][2]);
+        glVertex3f(vertices[index[1]][0], vertices[index[1]][1], vertices[index[1]][2]);
+        glColor3f(topColor[0], topColor[1], topColor[2]);
+        glVertex3f(vertices[index[2]][0], vertices[index[2]][1], vertices[index[2]][2]);
+        glVertex3f(vertices[index[3]][0], vertices[index[3]][1], vertices[index[3]][2]);
     }
 
     /**
@@ -128,14 +124,14 @@ public abstract class GameObject {
      * @param face 面の名前 "front", "back", "left", "right", "top", "bottom"
      * @return 面の頂点インデックス
      */
-    private int[][] getFaceIndices(String face) {
+    private int[] getFaceIndices(String face) {
         return switch (face) {
-            case "front" -> new int[][]{{0, 1, 5, 4}}; // 前左下、前右下、前右上、前左上
-            case "back" -> new int[][]{{3, 2, 6, 7}}; // 後左下、後右下、後右上、後左上
-            case "left" -> new int[][]{{0, 3, 7, 4}}; // 後左下、前左下、前左上、後左上
-            case "right" -> new int[][]{{1, 2, 6, 5}}; // 後右下、前右下、前右上、後右上
-            case "top" -> new int[][]{{4, 5, 6, 7}}; // 前左上、前右上、後右上、後左上
-            case "bottom" -> new int[][]{{0, 1, 2, 3}}; // 前左下、前右下、後右下、後左下
+            case "front" -> new int[]{0, 1, 5, 4}; // 前左下、前右下、前右上、前左上
+            case "back" -> new int[]{3, 2, 6, 7}; // 後左下、後右下、後右上、後左上
+            case "left" -> new int[]{0, 3, 7, 4}; // 後左下、前左下、前左上、後左上
+            case "right" -> new int[]{1, 2, 6, 5}; // 後右下、前右下、前右上、後右上
+            case "top" -> new int[]{4, 5, 6, 7}; // 前左上、前右上、後右上、後左上
+            case "bottom" -> new int[]{0, 1, 2, 3}; // 前左下、前右下、後右下、後左下
             default -> throw new IllegalArgumentException("Invalid face: " + face);
         };
     }
