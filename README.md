@@ -1,8 +1,8 @@
 # マインクラフト風のLWJGLを使ったゲーム
-**プログラミングの課題で好きな作品を作るらしいのでJAVAといえばマインクラフトだと思い、作ろうとした**
+**プログラミングの課題で好きな作品を作るらしいのでJAVAといえばマインクラフトだと思い、それっぽいのを作ろうとした**
 
  オブジェクト指向のいい練習にもなるだろうし...
-![image](https://github.com/user-attachments/assets/a765a005-b2ce-494f-a9df-b033852ed348)
+![スクリーンショット 2025-01-17 195034](https://github.com/user-attachments/assets/74fc0f29-0b02-483c-b5be-ae96c6f3990f)
 - 画像：最新版のワールドの画面
 
 ### LWJGLの厄介ポイント
@@ -180,4 +180,14 @@ classDiagram
 今から動作しないテストを書きます。
 
 ## インストールInstallation
-[ここからインストール(ver1.0)](https://github.com/p-nasimonan/Minicraft/releases/download/v1.0/minicraft-1.0.jar)
+[ここからインストール(ver1.01)](https://github.com/p-nasimonan/Minicraft/releases/download/v1.01/minicraft-1.01.jar)
+## 実行方法
+### Mac
+`-XstartOnFirstThread`をつける必要があるので、ターミナルを開いてください
+```
+java -XstartOnFirstThread -jar ダウンロードしたjarのパス
+```
+これを実行することで起動できます。
+
+### Windows
+ダブルクリックするだけで大丈夫
