@@ -1,3 +1,6 @@
+// プロジェクトのバージョン
+val version = "1.01"
+
 
 plugins {
     kotlin("jvm") version "2.0.21"
@@ -122,7 +125,7 @@ tasks.test {
 
 tasks.jar {
     archiveBaseName.set("minicraft") // JARファイルの基本名を設定
-    archiveVersion.set("1.0") // バージョンを設定
+    archiveVersion.set(version) // バージョンを設定
     manifest {
         attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main" // メインクラスを指定
     }
@@ -141,7 +144,7 @@ tasks.withType<Jar> {
 
 tasks.register<Jar>("fatJar") {
     archiveBaseName.set("minicraft")
-    archiveVersion.set("1.0")
+    archiveVersion.set(version)
     manifest {
         attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main"
     }
