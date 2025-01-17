@@ -34,6 +34,7 @@ public abstract class GameObject {
         this.showInfo = false;
         this.collider = new Collider(x, y, z, width, height, depth);
         this.world = world;
+        // 頂点座標を設定
         this.vertices = new float[][] {
             {x, y, z}, // 前面の左下
             {x + width, y, z}, // 前面の右下
@@ -123,17 +124,18 @@ public abstract class GameObject {
 
     /**
      * 指定された面の頂点インデックスを取得します
+     * ここで取得したインデックスは頂点座標の配列verticesに対応しています
      * @param face 面の名前 "front", "back", "left", "right", "top", "bottom"
      * @return 面の頂点インデックス
      */
     private int[][] getFaceIndices(String face) {
         return switch (face) {
-            case "front" -> new int[][]{{0, 1, 5, 4}};
-            case "back" -> new int[][]{{3, 2, 6, 7}};
-            case "left" -> new int[][]{{0, 3, 7, 4}};
-            case "right" -> new int[][]{{1, 2, 6, 5}};
-            case "top" -> new int[][]{{4, 5, 6, 7}};
-            case "bottom" -> new int[][]{{0, 1, 2, 3}};
+            case "front" -> new int[][]{{0, 1, 5, 4}}; // 前左下、前右下、前右上、前左上
+            case "back" -> new int[][]{{3, 2, 6, 7}}; // 後左下、後右下、後右上、後左上
+            case "left" -> new int[][]{{0, 3, 7, 4}}; // 後左下、前左下、前左上、後左上
+            case "right" -> new int[][]{{1, 2, 6, 5}}; // 後右下、前右下、前右上、後右上
+            case "top" -> new int[][]{{4, 5, 6, 7}}; // 前左上、前右上、後右上、後左上
+            case "bottom" -> new int[][]{{0, 1, 2, 3}}; // 前左下、前右下、後右下、後左下
             default -> throw new IllegalArgumentException("Invalid face: " + face);
         };
     }
