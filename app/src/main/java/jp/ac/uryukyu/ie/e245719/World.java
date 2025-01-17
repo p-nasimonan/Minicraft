@@ -1,12 +1,14 @@
 package jp.ac.uryukyu.ie.e245719;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class World {
-    private Block[][][] blocks;
-    private List<Mob> mobs;
-    private int width, height, depth;
-    private int originX, originY, originZ;
+    private Sky sky;
+    private final Block[][][] blocks;
+    private List<Mob> mobs = new ArrayList<>();
+    private final int width, height, depth;
+    private  final int originX, originY, originZ;
     private final static float G = -0.007f;
 
     public World(int width, int height, int depth) {
@@ -16,6 +18,7 @@ public class World {
         this.originX = -width / 2;
         this.originY = 0;
         this.originZ = -depth / 2;
+        sky = new Sky(this, "空", "air", originX, originY, originZ, width*2, height, depth*2);
         blocks = new Block[width][height][depth];
         // ブロックの初期化
         for (int x = 0; x < width; x++) {
@@ -47,6 +50,7 @@ public class World {
     }
 
     public void render() {
+        sky.render();
         for (int x = 0; x < blocks.length; x++) {
             for (int y = 0; y < blocks[0].length; y++) {
                 for (int z = 0; z < blocks[0][0].length; z++) {

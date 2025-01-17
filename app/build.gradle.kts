@@ -99,6 +99,7 @@ application {
     mainClass.set("jp.ac.uryukyu.ie.e245719.Main")
 }
 
+
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
@@ -125,6 +126,10 @@ tasks.jar {
     manifest {
         attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main" // メインクラスを指定
     }
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.withType<Jar> {

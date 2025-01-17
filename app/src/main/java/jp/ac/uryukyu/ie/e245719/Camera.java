@@ -1,14 +1,16 @@
 package jp.ac.uryukyu.ie.e245719;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 public class Camera {
     
-    private Vector3f direction;
-    private Vector3f position;
-    private Vector3f right;
-    private Vector2f rotation;
-    private Vector3f up;
-    private Matrix4f viewMatrix;
+    private final Vector3f direction;
+    private final Vector3f position;
+    private final Vector3f right;
+    private final Vector2f rotation;
+    private final Vector3f up;
+    private final Matrix4f viewMatrix;
 
     public Camera() {
         direction = new Vector3f();

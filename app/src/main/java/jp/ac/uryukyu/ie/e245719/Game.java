@@ -164,9 +164,6 @@ public class Game {
                 //System.out.println("FPS: " + fps);
             }
 
-            // 入力処理
-            handleInput();
-
             // 固定時間ステップでの更新
             while (steps >= secsPerUpdate) {
                 update();

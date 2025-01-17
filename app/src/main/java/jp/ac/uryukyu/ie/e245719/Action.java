@@ -93,7 +93,7 @@ public class Action {
      * @param yaw プレイヤーの向いている方向（度数）
      * @param blockType ブロックの種類
      */
-    public void replaceBlockInDirection(float pitch, float yaw, String blockType) {
+    public void replaceBlockInDirection(float pitch, float yaw, String blockId) {
         float playerX = actor.x;
         float playerY = actor.y;
         float playerZ = actor.z;
@@ -111,7 +111,7 @@ public class Action {
         int blockZ = (int) (playerZ + forwardZ);
 
         // ブロックを配置するロジックをここに追加
-        Block block = new Block(world, "block", "stone", blockX, blockY, blockZ, 1, 1, 1);
+        Block block = new Block(world, "block", blockId, blockX, blockY, blockZ, 1, 1, 1);
        this.world.replaceBlock(block);
     }
 }

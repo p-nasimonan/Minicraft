@@ -104,6 +104,24 @@ public abstract class GameObject {
     }
 
     /**
+     * 指定された面を描画します
+     * @param face 描画する面 "front", "back", "left", "right", "top", "bottom"
+     * @param topColor 面の上部の色(r,g,b)
+     * @param bottomColor 面の下部の色(r,g,b)
+     */
+    public void drawFace(String face, float[] topColor, float[] bottomColor) {
+        int[][] indices = getFaceIndices(face);
+        for (int[] index : indices) {
+            glColor3f(bottomColor[0], bottomColor[1], bottomColor[2]);
+            glVertex3f(vertices[index[0]][0], vertices[index[0]][1], vertices[index[0]][2]);
+            glVertex3f(vertices[index[1]][0], vertices[index[1]][1], vertices[index[1]][2]);
+            glColor3f(topColor[0], topColor[1], topColor[2]);
+            glVertex3f(vertices[index[2]][0], vertices[index[2]][1], vertices[index[2]][2]);
+            glVertex3f(vertices[index[3]][0], vertices[index[3]][1], vertices[index[3]][2]);
+        }
+    }
+
+    /**
      * 指定された面の頂点インデックスを取得します
      * @param face 面の名前 "front", "back", "left", "right", "top", "bottom"
      * @return 面の頂点インデックス

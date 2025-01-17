@@ -1,8 +1,5 @@
 package jp.ac.uryukyu.ie.e245719;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
 import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -13,7 +10,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  * プレイヤーの位置、カメラ制御、インベントリ管理などの機能を提供します
  */
 public class Player extends Mob {
-    private List<Item> inventory;
+    private Item[] inventory;
     private float pitch, yaw;
     private final Camera camera;
     private final MouseInput mouseInput;
@@ -29,7 +26,7 @@ public class Player extends Mob {
     public Player(InterFace interFace, World world, float x, float y, float z) {
         super(world, "player", "Player", 10, x, y, z, 100, 1, 4, 1);
         this.world = world;
-        inventory = new ArrayList<>();
+        inventory = new Item[36];
         // プレイヤーの初期位置を設定
         this.x = x;
         this.y = y; 
@@ -92,10 +89,10 @@ public class Player extends Mob {
                 case GLFW.GLFW_KEY_F3 -> debugInfo(); //トグルにしたい
             }
         }
-        if (interFace.isLeftButtonPressed()) {
+        if (interFace.isRightButtonPressed()) {
             this.action.replaceBlockInDirection(pitch, yaw, "stone");
         }
-        if (interFace.isRightButtonPressed()) {
+        if (interFace.isLeftButtonPressed()) {
             //　 破壊する(空気に置き換える)
             this.action.replaceBlockInDirection(pitch, yaw, "air");
         }
