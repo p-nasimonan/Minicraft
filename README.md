@@ -54,7 +54,7 @@ classDiagram
     }
 
     class World {
-        -blocks: List~Block~
+        -blocks: Blockp[][][]
         -enemies: List~Enemy~
         -gameObjects: List~GameObject~
         -g: float
