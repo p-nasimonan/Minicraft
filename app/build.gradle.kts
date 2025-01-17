@@ -120,6 +120,15 @@ tasks.test {
     
     // JUnitプラットフォームを使用
     useJUnitPlatform()
+    
+    // テストの出力を詳細に表示
+    testLogging {
+        events("passed", "skipped", "failed", "standardOut", "standardError")
+        showStandardStreams = true
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
 }
 
 

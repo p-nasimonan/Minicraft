@@ -38,7 +38,12 @@ public class PlayerTest {
 
     @Test
     public void 初期化できるか() {
+        System.out.println("=== プレイヤー初期化テスト開始 ===");
         Player testObject = new Player(interFace, world, 0, 2, 0);
+        System.out.println("作成されたプレイヤー:");
+        System.out.println("  名前: " + testObject.getName());
+        System.out.println("  ID: " + testObject.id);
+        System.out.println("  位置: (" + testObject.x + ", " + testObject.y + ", " + testObject.z + ")");
         
         Assertions.assertThat(testObject)
             .satisfies(player -> {
@@ -48,6 +53,7 @@ public class PlayerTest {
                 Assertions.assertThat(player.y).isEqualTo(2.0f);
                 Assertions.assertThat(player.z).isEqualTo(0.0f);
             });
+        System.out.println("=== プレイヤー初期化テスト完了 ===\n");
     }
 
     @Test

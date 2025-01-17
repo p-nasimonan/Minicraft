@@ -8,8 +8,14 @@ class WorldTest extends TestBase {
 
     @Test
     void ワールドが正しく初期化される() {
+        System.out.println("=== ワールド初期化テスト開始 ===");
+        System.out.println("ブロック配列の確認:");
+        System.out.println("  ブロック配列: " + (world.getBlocks() != null ? "初期化済み" : "未初期化"));
         assertNotNull(world.getBlocks());
+        System.out.println("Mob配列の確認:");
+        System.out.println("  Mob配列: " + (world.getMobs() != null ? "初期化済み" : "未初期化"));
         assertNotNull(world.getMobs());
+        System.out.println("=== ワールド初期化テスト完了 ===\n");
     }
 
     @Test
