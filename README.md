@@ -181,14 +181,15 @@ classDiagram
 今から動作しないテストを書きます。
 
 ## インストールInstallation
-[ここからインストール(ver1.01)](https://github.com/p-nasimonan/Minicraft/releases/download/v1.01/minicraft-1.01.jar)
-## 実行方法
-### Mac
+### [ここからダウンロード(ver1.01)](https://github.com/p-nasimonan/Minicraft/releases/download/v1.01/minicraft-1.01.jar)
+
+### 実行方法
+#### Mac
 `-XstartOnFirstThread`をつける必要があるので、ターミナルを開いてください
 ```
 java -XstartOnFirstThread -jar ダウンロードしたjarのパス
 ```
 これを実行することで起動できます。
 
-### Windows
+#### Windows
 ダブルクリックするだけで大丈夫
