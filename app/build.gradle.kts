@@ -100,6 +100,11 @@ java {
 application {
     // Define the main class for the application.
     mainClass.set("jp.ac.uryukyu.ie.e245719.Main")
+    applicationDefaultJvmArgs = if (System.getProperty("os.name").lowercase().contains("mac")) {
+        listOf("-XstartOnFirstThread")
+    } else {
+        listOf()
+    }
 }
 
 
