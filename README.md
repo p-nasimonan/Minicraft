@@ -7,7 +7,7 @@
 - 画像：最新版のワールドの画面
 
 ## インストールInstallation
-### [ここからダウンロード(ver1.01)](https://github.com/p-nasimonan/Minicraft/releases/download/v1.01/minicraft-1.01.jar)
+### [ここから最新版のjarをダウンロード](https://github.com/p-nasimonan/Minicraft/releases/latest)
 
 ### LWJGLの厄介ポイント
 - macOSの場合jvmの引数に"-XstartOnFirstThread"をつけないといけない **(逆にwindowsはこの設定は消してください)**
