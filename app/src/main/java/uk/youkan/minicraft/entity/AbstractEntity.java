@@ -35,25 +35,15 @@ public abstract class AbstractEntity implements Entity {
     protected float vy;
     protected boolean showInfo;
 
-    // レガシー互換用のフィールド（サブクラスで直接参照可能）
-    protected float x, y, z;
-    protected final float width, height, depth;
-
     public AbstractEntity(World world, String name, String id, float x, float y, float z, float width, float height, float depth) {
         this.world = world;
         this.name = name;
         this.id = id;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
         this.onGround = false;
         this.vy = 0.0f;
         this.showInfo = false;
         
-        // コンポーネントを初期化
+        // コンポーネントを初期化（全ての座標情報はTransformが管理）
         this.transform = new Transform(x, y, z, width, height, depth);
         this.boxCollider = new BoxCollider(transform);
         this.renderer = new BoxRenderer(transform);
@@ -99,11 +89,7 @@ public abstract class AbstractEntity implements Entity {
 
     @Override
     public void setPosition(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
         transform.setPosition(x, y, z);
-        renderer.updateVertices();
     }
 
     public void setName(String name) {
@@ -160,7 +146,6 @@ public abstract class AbstractEntity implements Entity {
         vy = physics.getVy();
 
         if (!checkCollisionWithBlocks(transform.getX(), newY, transform.getZ())) {
-            y = newY;
             transform.setY(newY);
             onGround = false;
             physics.setOnGround(false);

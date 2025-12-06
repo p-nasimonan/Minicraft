@@ -24,7 +24,7 @@ public class Sky extends AbstractEntity {
     @Override
     public void render() {
         glPushMatrix();
-        glTranslatef(x, y, z);
+        glTranslatef(getX(), getY(), getZ());
 
         // グラデーションの色を設定
         float[] topColor = {0.3f, 0.8f, 1.0f};

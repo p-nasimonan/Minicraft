@@ -27,6 +27,7 @@ public class Block extends Item {
     public void render() {
         glEnable(GL_DEPTH_TEST);
         glPushMatrix();
+        glTranslatef(getX(), getY(), getZ());
 
         glCullFace(GL_BACK);
 
@@ -59,6 +60,9 @@ public class Block extends Item {
      * @return 触れている場合はtrue
      */
     private boolean isFaceTouching(String face) {
+        int x = (int) getX();
+        int y = (int) getY();
+        int z = (int) getZ();
         return switch (face) {
             case "front" -> !world.getBlockAt(x, y, z - 1).isAir();
             case "back" -> !world.getBlockAt(x, y, z + 1).isAir();
