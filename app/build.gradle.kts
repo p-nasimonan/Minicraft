@@ -107,6 +107,11 @@ application {
     }
 }
 
+// runタスクにシステムプロパティを追加
+tasks.named<JavaExec>("run") {
+    val debugMode = System.getProperty("debug") ?: "true"
+    systemProperty("debug", debugMode)
+}
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.

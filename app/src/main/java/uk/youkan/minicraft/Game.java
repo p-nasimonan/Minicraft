@@ -27,6 +27,8 @@ public class Game {
     private long lastFpsTime;
     private int fps;
     private int frames;
+    // システムプロパティ "debug" で制御可能 (java -Ddebug=true)
+    private boolean debugMode = "true".equalsIgnoreCase(System.getProperty("debug", "true"));
 
     /**
      * ゲームを開始します
@@ -192,6 +194,11 @@ public class Game {
             player.setCamera();
             world.render();
             player.render();
+            
+            // デバッグ情報を表示
+            if (debugMode) {
+                printDebugInfo();
+            }
         } else {
             startButton.render();
         }
@@ -257,6 +264,19 @@ public class Game {
         cursorEnabled = false;
         GLFW.glfwSetInputMode(mainWindow, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
         GLFW.glfwSetCursorPos(mainWindow, 400, 300);
+    }
+
+    /**
+     * デバッグ情報をコンソールに表示
+     */
+    private void printDebugInfo() {
+        System.out.printf("\rFPS: %d | Pos: (%.2f, %.2f, %.2f) | Pitch: %.2f° | Yaw: %.2f° | Mouse: (%.2f, %.2f)",
+            fps,
+            player.getX(), player.getY(), player.getZ(),
+            player.getPitch(), player.getYaw(),
+            inputManager.getMouse().getDisplVec().x,
+            inputManager.getMouse().getDisplVec().y
+        );
     }
 
     /**

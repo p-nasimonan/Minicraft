@@ -128,7 +128,8 @@ public class Player extends Mob {
 
     private void updateCamera() {
         camera.setPosition(getX(), getY(), getZ());
-        camera.setRotation(pitch, yaw);
+        // 度数をラジアンに変換してカメラに渡す
+        camera.setRotation((float)Math.toRadians(pitch), (float)Math.toRadians(yaw));
     }
 
     @Override
@@ -143,5 +144,13 @@ public class Player extends Mob {
 
     public void openInventory() {
         // インベントリを開くロジック
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public float getYaw() {
+        return yaw;
     }
 }

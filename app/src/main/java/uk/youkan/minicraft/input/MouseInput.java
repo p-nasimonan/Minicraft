@@ -8,9 +8,9 @@ import static org.lwjgl.glfw.GLFW.*;
  * 位置、ボタン状態、ホイール回転を追跡します
  */
 public class MouseInput {
-    private Vector2f currentPos;
-    private Vector2f previousPos;
-    private Vector2f displVec;
+    private final Vector2f currentPos;
+    private final Vector2f previousPos;
+    private final Vector2f displVec;
     
     private boolean inWindow;
     private boolean leftButtonPressed;
@@ -19,10 +19,13 @@ public class MouseInput {
     private boolean rightButtonPressedLast;
     private boolean middleButtonPressed;
     private double scrollDelta;
+    
+    // 最初のフレームかどうか（視点がガクッとなるのを防ぐ用）
+    private boolean firstUpdate = true;
 
     public MouseInput(long windowHandle) {
-        previousPos = new Vector2f(-1, -1);
-        currentPos = new Vector2f();
+        previousPos = new Vector2f(0, 0);
+        currentPos = new Vector2f(0, 0);
         displVec = new Vector2f();
         leftButtonPressed = false;
         leftButtonPressedLast = false;
@@ -63,15 +66,24 @@ public class MouseInput {
      * フレーム開始時に呼び出し（状態更新用）
      */
     public void update() {
-        // 位置差分を計算
         displVec.x = 0;
         displVec.y = 0;
-        if (previousPos.x > 0 && previousPos.y > 0 && inWindow) {
+
+        // 修正ポイント: 座標がマイナスでも計算するように条件を緩和
+        // 最初の1フレーム目だけは、移動量を計算せず位置合わせだけ行う
+        if (firstUpdate) {
+            previousPos.x = currentPos.x;
+            previousPos.y = currentPos.y;
+            firstUpdate = false;
+        } else if (inWindow) {
+            // ここで単純に引き算するだけでOK（マイナス同士の計算も数学的に正しくなる）
             displVec.x = currentPos.x - previousPos.x;
             displVec.y = currentPos.y - previousPos.y;
         }
         
-        previousPos.set(currentPos);
+        // 現在位置を保存
+        previousPos.x = currentPos.x;
+        previousPos.y = currentPos.y;
         
         // ボタン状態の前フレーム値を更新
         leftButtonPressedLast = leftButtonPressed;
