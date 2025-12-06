@@ -1,11 +1,13 @@
 package uk.youkan.minicraft.entity;
 
+import uk.youkan.minicraft.entity.component.CollisionLayer;
 import uk.youkan.minicraft.input.Action;
 import uk.youkan.minicraft.world.World;
 
 /**
  * モブ（動く生物）の基本実装
  * MobBehaviorインターフェースを実装
+ * 衝突レイヤー: MOB
  */
 public abstract class Mob extends AbstractEntity implements MobBehavior {
     private int attack;
@@ -19,6 +21,9 @@ public abstract class Mob extends AbstractEntity implements MobBehavior {
         this.hp = hp;
         this.maxHp = hp;
         this.action = new Action(this, world);
+        
+        // Mobの衝突レイヤーを設定
+        this.boxCollider.setLayer(CollisionLayer.MOB);
     }
 
     @Override

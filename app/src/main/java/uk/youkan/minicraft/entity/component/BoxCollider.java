@@ -3,13 +3,65 @@ package uk.youkan.minicraft.entity.component;
 /**
  * 当たり判定コンポーネント
  * Transformと連動して衝突判定を行います
+ * 衝突レイヤーによって異なる応答を定義できます
  */
 public class BoxCollider {
     private final Transform transform;
+    private CollisionLayer layer;
+    private boolean isTrigger;  // trueの場合、物理的な衝突を起こさない（トリガーのみ）
 
     public BoxCollider(Transform transform) {
         this.transform = transform;
+        this.layer = CollisionLayer.NONE;
+        this.isTrigger = false;
     }
+
+    public BoxCollider(Transform transform, CollisionLayer layer) {
+        this.transform = transform;
+        this.layer = layer;
+        this.isTrigger = false;
+    }
+
+    // === Layer management ===
+
+    public CollisionLayer getLayer() { return layer; }
+    public void setLayer(CollisionLayer layer) { this.layer = layer; }
+
+    public boolean isTrigger() { return isTrigger; }
+    public void setTrigger(boolean trigger) { this.isTrigger = trigger; }
+
+    /**
+     * このコライダーと他のコライダーの衝突応答を取得
+     */
+    public CollisionResponse getResponseWith(BoxCollider other) {
+        if (other == null) return CollisionResponse.NONE;
+        return CollisionMatrix.getResponse(this.layer, other.layer);
+    }
+
+    /**
+     * 他のコライダーに対して移動をブロックするか
+     */
+    public boolean shouldBlockMovement(BoxCollider other) {
+        if (isTrigger || other.isTrigger) return false;
+        return CollisionMatrix.shouldBlock(this.layer, other.layer);
+    }
+
+    /**
+     * 他のコライダーと衝突時にイベントをトリガーするか
+     */
+    public boolean shouldTriggerEvent(BoxCollider other) {
+        return CollisionMatrix.shouldTrigger(this.layer, other.layer);
+    }
+
+    /**
+     * 他のコライダーと衝突時に押し出すか
+     */
+    public boolean shouldPush(BoxCollider other) {
+        if (isTrigger || other.isTrigger) return false;
+        return CollisionMatrix.shouldPush(this.layer, other.layer);
+    }
+
+    // === Collision detection ===
 
     /**
      * 他のBoxColliderとの衝突を判定

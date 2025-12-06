@@ -5,14 +5,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
-import uk.youkan.minicraft.physics.Collider;
-import uk.youkan.minicraft.ui.InputHandler;
+import uk.youkan.minicraft.input.InputManager;
 import uk.youkan.minicraft.world.World;
 import uk.youkan.minicraft.world.block.Block;
 
 public class PlayerTest {
     private static World world;
-    private static InputHandler inputHandler;
+    private static InputManager inputManager;
     private static long dummyWindow;
 
     @BeforeAll
@@ -33,13 +32,13 @@ public class PlayerTest {
         GL.createCapabilities();
 
         world = new World(10, 10, 10);
-        inputHandler = new InputHandler(dummyWindow);
+        inputManager = new InputManager(dummyWindow);
     }
 
     @Test
     public void 初期化できるか() {
         System.out.println("=== プレイヤー初期化テスト開始 ===");
-        Player testObject = new Player(inputHandler, world, 0, 2, 0);
+        Player testObject = new Player(inputManager, world, 0, 2, 0);
         System.out.println("作成されたプレイヤー:");
         System.out.println("  名前: " + testObject.getName());
         System.out.println("  ID: " + testObject.getId());
@@ -58,18 +57,19 @@ public class PlayerTest {
 
     @Test
     public void 衝突テスト() {
-        Player testPlayer = new Player(inputHandler, world, 0, 2, 0);
+        Player testPlayer = new Player(inputManager, world, 0, 2, 0);
         Block testBlock = new Block(world, "testblock", "stone", 0, 2, 0, 1, 1, 1);
-        Collider collider = testBlock.getCollider();
+        var collider = testBlock.getBoxCollider();
+        var transform = collider.getTransform();
         
-        Assertions.assertThat(collider)
-            .satisfies(c -> {
-                Assertions.assertThat(c.x).isEqualTo(0);
-                Assertions.assertThat(c.y).isEqualTo(2);
-                Assertions.assertThat(c.z).isEqualTo(0);
-                Assertions.assertThat(c.width).isEqualTo(1);
-                Assertions.assertThat(c.height).isEqualTo(1);
-                Assertions.assertThat(c.depth).isEqualTo(1);
+        Assertions.assertThat(transform)
+            .satisfies(t -> {
+                Assertions.assertThat(t.getX()).isEqualTo(0);
+                Assertions.assertThat(t.getY()).isEqualTo(2);
+                Assertions.assertThat(t.getZ()).isEqualTo(0);
+                Assertions.assertThat(t.getWidth()).isEqualTo(1);
+                Assertions.assertThat(t.getHeight()).isEqualTo(1);
+                Assertions.assertThat(t.getDepth()).isEqualTo(1);
             });
 
         Assertions.assertThat(testPlayer.checkCollisionInfo(testBlock)).isEqualTo("Collision between player and testblock: YES");

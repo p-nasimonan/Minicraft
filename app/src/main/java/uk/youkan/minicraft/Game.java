@@ -6,8 +6,8 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 
 import uk.youkan.minicraft.entity.Player;
+import uk.youkan.minicraft.input.InputManager;
 import uk.youkan.minicraft.ui.Button;
-import uk.youkan.minicraft.ui.InputHandler;
 import uk.youkan.minicraft.world.World;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -22,7 +22,7 @@ public class Game {
     private boolean gameStarted = false;
     private Button startButton;
     private boolean cursorEnabled = true;
-    private InputHandler inputHandler;
+    private InputManager inputManager;
     private boolean cursorToggleInProgress = false;
     private long lastFpsTime;
     private int fps;
@@ -79,9 +79,10 @@ public class Game {
      */
     private void gameInit() {
         this.startButton = new Button(350, 250, 100, 50, "Start");
-        this.inputHandler = new InputHandler(mainWindow);
+        this.inputManager = new InputManager(mainWindow);
+        this.inputManager.setUIScreenHeight(600.0f);
         this.world = new World(64, 50, 64);
-        this.player = new Player(inputHandler, world, 0, 5, 0);
+        this.player = new Player(inputManager, world, 0, 5, 0);
 
         lastFpsTime = System.currentTimeMillis();
         fps = 0;
@@ -116,10 +117,12 @@ public class Game {
             float fW = fH * aspectRatio;
             glFrustum(-fW, fW, -fH, fH, zNear, zFar);
         } else {
-            float scaleFactor = 600.0f / height;
-            glOrtho(0, width * scaleFactor, 0, 600, -1, 1);
+            glOrtho(0, width, 0, height, -1, 1);
+            // UI座標系の高さを更新
+            if (inputManager != null) {
+                inputManager.setUIScreenHeight(height);
+            }
         }
-
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
     }
@@ -168,14 +171,14 @@ public class Game {
      * ゲームの状態を更新します
      */
     private void update() {
-        inputHandler.update();
+        inputManager.update();
         handleInput();
         if (gameStarted) {
             world.update();
 
             if (!cursorEnabled) {
                 player.update();
-                player.handleInput(inputHandler);
+                player.handleInput();
             }
         }
     }
@@ -206,18 +209,18 @@ public class Game {
      */
     private void handleInput() {
         if (gameStarted) {
-            if (inputHandler.isKeyPressed("esc")) {
+            if (inputManager.isKeyPressed("esc")) {
                 toggleCursor();
             }
         } else {
-            float mouseX = inputHandler.getMouseX();
-            float mouseY = inputHandler.getMouseY();
+            float mouseX = inputManager.getUIMouseX();
+            float mouseY = inputManager.getUIMouseY();
             startButton.setHovered(startButton.isTouched(mouseX, mouseY));
 
-            if (inputHandler.isKeyPressed("enter")) {
+            if (inputManager.isKeyPressed("enter")) {
                 gamestart();
             }
-            if (startButton.isTouched(mouseX, mouseY) && inputHandler.isLeftButtonPressed()) {
+            if (startButton.isTouched(mouseX, mouseY) && inputManager.isLeftButtonPressed()) {
                 gamestart();
             }
         }

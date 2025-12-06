@@ -2,9 +2,9 @@ package uk.youkan.minicraft.entity;
 
 import uk.youkan.minicraft.entity.component.BoxCollider;
 import uk.youkan.minicraft.entity.component.BoxRenderer;
+import uk.youkan.minicraft.entity.component.CollisionLayer;
 import uk.youkan.minicraft.entity.component.Physics;
 import uk.youkan.minicraft.entity.component.Transform;
-import uk.youkan.minicraft.physics.Collider;
 import uk.youkan.minicraft.world.World;
 import uk.youkan.minicraft.world.block.Block;
 
@@ -26,9 +26,6 @@ public abstract class AbstractEntity implements Entity {
     protected final BoxCollider boxCollider;
     protected final BoxRenderer renderer;
     protected Physics physics;
-    
-    // レガシー互換のためのCollider（後方互換性）
-    protected Collider collider;
     
     // 参照
     protected World world;
@@ -66,9 +63,6 @@ public abstract class AbstractEntity implements Entity {
         if (world != null) {
             physics.setGravity(world.getG());
         }
-        
-        // レガシー互換のためのCollider
-        this.collider = new Collider(x, y, z, width, height, depth);
     }
 
     // === Entity interface implementation ===
@@ -96,11 +90,11 @@ public abstract class AbstractEntity implements Entity {
     public float getZ() { return transform.getZ(); }
 
     @Override
-    public Collider getCollider() {
-        if (collider == null) {
-            throw new IllegalStateException("Collider is not initialized");
+    public BoxCollider getBoxCollider() {
+        if (boxCollider == null) {
+            throw new IllegalStateException("BoxCollider is not initialized");
         }
-        return collider;
+        return boxCollider;
     }
 
     @Override
@@ -110,9 +104,6 @@ public abstract class AbstractEntity implements Entity {
         this.z = z;
         transform.setPosition(x, y, z);
         renderer.updateVertices();
-        if (collider != null) {
-            collider.setPosition(x, y, z);
-        }
     }
 
     public void setName(String name) {
@@ -171,9 +162,6 @@ public abstract class AbstractEntity implements Entity {
         if (!checkCollisionWithBlocks(transform.getX(), newY, transform.getZ())) {
             y = newY;
             transform.setY(newY);
-            if (collider != null) {
-                collider.setPosition(transform.getX(), newY, transform.getZ());
-            }
             onGround = false;
             physics.setOnGround(false);
         } else {
@@ -213,17 +201,11 @@ public abstract class AbstractEntity implements Entity {
     }
 
     public String checkCollisionInfo(Entity other) {
-        if (boxCollider == null || other.getCollider() == null) {
+        if (boxCollider == null || other.getBoxCollider() == null) {
             return "Collider not initialized";
         }
         
-        if (other instanceof AbstractEntity otherEntity) {
-            boolean isColliding = boxCollider.intersects(otherEntity.getBoxCollider());
-            return String.format("Collision between %s and %s: %s",
-                this.name, other.getName(), isColliding ? "YES" : "NO");
-        }
-        
-        boolean isColliding = collider.intersects(other.getCollider());
+        boolean isColliding = boxCollider.intersects(other.getBoxCollider());
         return String.format("Collision between %s and %s: %s",
             this.name, other.getName(), isColliding ? "YES" : "NO");
     }
@@ -231,12 +213,6 @@ public abstract class AbstractEntity implements Entity {
     // === Component getters ===
 
     public Transform getTransform() { return transform; }
-    public BoxCollider getBoxCollider() { return boxCollider; }
     public BoxRenderer getRenderer() { return renderer; }
     public Physics getPhysics() { return physics; }
-    
-    // レガシー互換用のセッター
-    protected void setCollider(Collider collider) {
-        this.collider = collider;
-    }
 }

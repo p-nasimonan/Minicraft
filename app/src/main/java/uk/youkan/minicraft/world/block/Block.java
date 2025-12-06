@@ -1,6 +1,6 @@
 package uk.youkan.minicraft.world.block;
 
-import uk.youkan.minicraft.entity.component.BoxCollider;
+import uk.youkan.minicraft.entity.component.CollisionLayer;
 import uk.youkan.minicraft.item.Item;
 import uk.youkan.minicraft.world.World;
 
@@ -8,23 +8,19 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * ブロッククラス
+ * 衝突レイヤー: BLOCK（Mobは乗れる・通れない）
  */
 public class Block extends Item {
 
     public Block(World world, String name, String id, float x, float y, float z, float width, float height, float depth) {
         super(world, name, id, x, y, z, width, height, depth);
+        
+        // Blockの衝突レイヤーを設定（Mobの移動をブロック）
+        this.boxCollider.setLayer(CollisionLayer.BLOCK);
     }
 
     public boolean isAir() {
         return this.id.equals("air");
-    }
-
-    /**
-     * コンポーネントベースのBoxColliderを取得
-     */
-    @Override
-    public BoxCollider getBoxCollider() {
-        return super.getBoxCollider();
     }
 
     @Override

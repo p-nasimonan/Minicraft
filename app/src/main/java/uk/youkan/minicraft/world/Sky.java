@@ -1,17 +1,19 @@
 package uk.youkan.minicraft.world;
 
 import uk.youkan.minicraft.entity.AbstractEntity;
-import uk.youkan.minicraft.physics.Collider;
+import uk.youkan.minicraft.entity.component.CollisionLayer;
 
 import static org.lwjgl.opengl.GL11.*;
 
 /**
  * 空クラス
+ * 衝突レイヤー: NONE（衝突判定なし）
  */
 public class Sky extends AbstractEntity {
     public Sky(World world, String name, String id, float x, float y, float z, float width, float height, float depth) {
         super(world, name, id, x, y, z, width, height, depth);
-        this.collider = new Collider(x, y, z, width, height, depth);
+        // 空は衝突判定を持たない
+        this.boxCollider.setLayer(CollisionLayer.NONE);
     }
 
     @Override

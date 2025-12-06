@@ -39,16 +39,17 @@ public class EntityTest extends TestBase {
     @Test
     public void コライダー取得テスト() {
         TestEntity testObject = new TestEntity(world, "test", "test", 0, 0, 0, 1, 1, 1);
-        var collider = testObject.getCollider();
+        var collider = testObject.getBoxCollider();
+        var transform = collider.getTransform();
         
-        Assertions.assertThat(collider)
-            .satisfies(c -> {
-                Assertions.assertThat(c.x).isEqualTo(0.0f);
-                Assertions.assertThat(c.y).isEqualTo(0.0f);
-                Assertions.assertThat(c.z).isEqualTo(0.0f);
-                Assertions.assertThat(c.width).isEqualTo(1.0f);
-                Assertions.assertThat(c.height).isEqualTo(1.0f);
-                Assertions.assertThat(c.depth).isEqualTo(1.0f);
+        Assertions.assertThat(transform)
+            .satisfies(t -> {
+                Assertions.assertThat(t.getX()).isEqualTo(0.0f);
+                Assertions.assertThat(t.getY()).isEqualTo(0.0f);
+                Assertions.assertThat(t.getZ()).isEqualTo(0.0f);
+                Assertions.assertThat(t.getWidth()).isEqualTo(1.0f);
+                Assertions.assertThat(t.getHeight()).isEqualTo(1.0f);
+                Assertions.assertThat(t.getDepth()).isEqualTo(1.0f);
             });
     }
 
@@ -57,13 +58,13 @@ public class EntityTest extends TestBase {
         TestEntity obj1 = new TestEntity(world, "obj1", "test", 0, 0, 0, 1, 1, 1);
         TestEntity obj2 = new TestEntity(world, "obj2", "test", 0.5f, 0, 0, 1, 1, 1);
         
-        Assertions.assertThat(obj1.getCollider().intersects(obj2.getCollider()))
+        Assertions.assertThat(obj1.getBoxCollider().intersects(obj2.getBoxCollider()))
             .as("重なっているオブジェクトは衝突を検出するべきです")
             .isTrue();
         
         TestEntity obj3 = new TestEntity(world, "obj3", "test", 2, 0, 0, 1, 1, 1);
         
-        Assertions.assertThat(obj1.getCollider().intersects(obj3.getCollider()))
+        Assertions.assertThat(obj1.getBoxCollider().intersects(obj3.getBoxCollider()))
             .as("重なっていないオブジェクトは衝突を検出しないべきです")
             .isFalse();
     }
@@ -86,7 +87,7 @@ public class EntityTest extends TestBase {
     public void 衝突判定が正しく機能する() {
         TestEntity obj1 = new TestEntity(world, "obj1", "test", 0, 0, 0, 1, 1, 1);
         TestEntity obj2 = new TestEntity(world, "obj2", "test", 0.5f, 0.5f, 0.5f, 1, 1, 1);
-        Assertions.assertThat(obj1.getCollider().intersects(obj2.getCollider()))
+        Assertions.assertThat(obj1.getBoxCollider().intersects(obj2.getBoxCollider()))
             .as("重なっているオブジェクトは衝突を検出するべきです")
             .isTrue();
     }

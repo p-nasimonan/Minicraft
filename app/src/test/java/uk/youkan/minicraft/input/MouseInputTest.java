@@ -15,6 +15,7 @@ class MouseInputTest extends TestBase {
     @Test
     void マウス入力の更新が例外を発生させない() {
         MouseInput mouseInput = new MouseInput(dummyWindow);
-        assertDoesNotThrow(mouseInput::input);
+        assertDoesNotThrow(mouseInput::update);
     }
 }
+

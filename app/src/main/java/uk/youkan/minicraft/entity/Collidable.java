@@ -1,16 +1,16 @@
 package uk.youkan.minicraft.entity;
 
-import uk.youkan.minicraft.physics.Collider;
+import uk.youkan.minicraft.entity.component.BoxCollider;
 
 /**
  * 衝突判定を持つオブジェクトのインターフェース
  */
 public interface Collidable {
     /**
-     * Colliderを取得します
-     * @return このオブジェクトのCollider
+     * BoxColliderを取得します
+     * @return このオブジェクトのBoxCollider
      */
-    Collider getCollider();
+    BoxCollider getBoxCollider();
     
     /**
      * 指定された位置でのブロックとの衝突判定を行います

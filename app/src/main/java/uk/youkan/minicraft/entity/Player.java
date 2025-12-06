@@ -1,11 +1,9 @@
 package uk.youkan.minicraft.entity;
 
-import org.lwjgl.glfw.GLFW;
 import uk.youkan.minicraft.input.Action;
 import uk.youkan.minicraft.input.Camera;
-import uk.youkan.minicraft.input.MouseInput;
+import uk.youkan.minicraft.input.InputManager;
 import uk.youkan.minicraft.item.Item;
-import uk.youkan.minicraft.ui.InputHandler;
 import uk.youkan.minicraft.world.World;
 
 import static org.lwjgl.opengl.GL11.glRotatef;
@@ -19,20 +17,20 @@ public class Player extends Mob {
     private Item[] inventory;
     private float pitch, yaw;
     private final Camera camera;
-    private final MouseInput mouseInput;
+    private final InputManager inputManager;
     private static final float MOUSE_SENSITIVITY = 0.2f;
     private String mode;
     private final float eyeY = 1.7f;
 
     /**
      * プレイヤーを初期化します
-     * @param inputHandler 入力ハンドラ
+     * @param inputManager 入力マネージャ
      * @param world Worldへの参照
      * @param x X座標
      * @param y Y座標
      * @param z Z座標
      */
-    public Player(InputHandler inputHandler, World world, float x, float y, float z) {
+    public Player(InputManager inputManager, World world, float x, float y, float z) {
         super(world, "player", "Player", 10, x, y, z, 100, 1, 4, 1);
         this.world = world;
         inventory = new Item[36];
@@ -43,16 +41,14 @@ public class Player extends Mob {
 
         this.camera = new Camera();
         camera.setPosition(getX(), getY(), getZ());
-        this.mouseInput = inputHandler.getMouseInput();
+        this.inputManager = inputManager;
         this.action = new Action(this, world);
     }
 
     @Override
     public void update() {
-        mouseInput.input();
-
-        float deltaYaw = mouseInput.getDisplVec().x * MOUSE_SENSITIVITY;
-        float deltaPitch = mouseInput.getDisplVec().y * MOUSE_SENSITIVITY;
+        float deltaYaw = inputManager.getMouse().getDisplVec().x * MOUSE_SENSITIVITY;
+        float deltaPitch = inputManager.getMouse().getDisplVec().y * MOUSE_SENSITIVITY;
 
         rotate(deltaPitch, deltaYaw);
         applyGravity();
@@ -61,25 +57,37 @@ public class Player extends Mob {
 
     /**
      * プレイヤーの入力を処理します
-     * @param inputHandler 入力ハンドラ
      */
-    public void handleInput(InputHandler inputHandler) {
-        if (inputHandler.isKeyPressed()) {
-            switch (inputHandler.getPressedKey()) {
-                case GLFW.GLFW_KEY_W -> this.action.move("forward", yaw);
-                case GLFW.GLFW_KEY_S -> this.action.move("backward", yaw);
-                case GLFW.GLFW_KEY_A -> this.action.move("left", yaw);
-                case GLFW.GLFW_KEY_D -> this.action.move("right", yaw);
-                case GLFW.GLFW_KEY_SPACE -> this.action.jump();
-                case GLFW.GLFW_KEY_LEFT_SHIFT -> this.action.sneak();
-                case GLFW.GLFW_KEY_E -> openInventory();
-                case GLFW.GLFW_KEY_F3 -> debugInfo();
-            }
+    public void handleInput() {
+        if (inputManager.isKeyPressed("w")) {
+            this.action.move("forward", yaw);
         }
-        if (inputHandler.isRightButtonPressed()) {
+        if (inputManager.isKeyPressed("s")) {
+            this.action.move("backward", yaw);
+        }
+        if (inputManager.isKeyPressed("a")) {
+            this.action.move("left", yaw);
+        }
+        if (inputManager.isKeyPressed("d")) {
+            this.action.move("right", yaw);
+        }
+        if (inputManager.isKeyPressed("space")) {
+            this.action.jump();
+        }
+        if (inputManager.isKeyPressed("shift")) {
+            this.action.sneak();
+        }
+        if (inputManager.isKeyPressed("e")) {
+            openInventory();
+        }
+        if (inputManager.isKeyPressed("f3")) {
+            debugInfo();
+        }
+        
+        if (inputManager.isRightButtonPressed()) {
             this.action.replaceBlockInDirection(pitch, yaw, "stone");
         }
-        if (inputHandler.isLeftButtonPressed()) {
+        if (inputManager.isLeftButtonPressed()) {
             this.action.replaceBlockInDirection(pitch, yaw, "air");
         }
     }
