@@ -5,13 +5,17 @@ import java.util.List;
 
 import uk.youkan.minicraft.entity.Mob;
 import uk.youkan.minicraft.world.block.Block;
+import uk.youkan.minicraft.world.block.BlockType;
 
 /**
- * ワールドクラス
+ * ワールドクラス - Chunk ベース管理
  */
 public class World {
     private Sky sky;
-    private final Block[][][] blocks;
+    
+    private final Chunk[][][] chunks;
+    private final int chunksX, chunksY, chunksZ;
+    
     private List<Mob> mobs = new ArrayList<>();
     private final int width, height, depth;
     private final int originX, originY, originZ;
@@ -31,15 +35,32 @@ public class World {
         this.originY = 0;
         this.originZ = -depth / 2;
         sky = new Sky(this, "空", "air", originX, originY, originZ, width * 2, height, depth * 2);
-        blocks = new Block[width][height][depth];
-        // ブロックの初期化
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int z = 0; z < depth; z++) {
-                    if (y < 1) {
-                        blocks[x][y][z] = new Block(this, "草ブロック", "grass", x + originX, y + originY, z + originZ, 1, 1, 1);
-                    } else {
-                        blocks[x][y][z] = new Block(this, "空気ブロック", "air", x + originX, y + originY, z + originZ, 1, 1, 1);
+        
+        chunksX = (int) Math.ceil((double) width / Chunk.CHUNK_SIZE);
+        chunksY = (int) Math.ceil((double) height / Chunk.CHUNK_SIZE);
+        chunksZ = (int) Math.ceil((double) depth / Chunk.CHUNK_SIZE);
+        chunks = new Chunk[chunksX][chunksY][chunksZ];
+        
+        for (int cx = 0; cx < chunksX; cx++) {
+            for (int cy = 0; cy < chunksY; cy++) {
+                for (int cz = 0; cz < chunksZ; cz++) {
+                    int chunkWorldX = originX + cx * Chunk.CHUNK_SIZE;
+                    int chunkWorldY = originY + cy * Chunk.CHUNK_SIZE;
+                    int chunkWorldZ = originZ + cz * Chunk.CHUNK_SIZE;
+                    chunks[cx][cy][cz] = new Chunk(this, chunkWorldX, chunkWorldY, chunkWorldZ);
+                    
+                    // Chunk 内のブロックを初期化
+                    for (int x = 0; x < Chunk.CHUNK_SIZE; x++) {
+                        for (int y = 0; y < Chunk.CHUNK_SIZE; y++) {
+                            for (int z = 0; z < Chunk.CHUNK_SIZE; z++) {
+                                int worldY = chunkWorldY + y;
+                                if (worldY < 1) {
+                                    chunks[cx][cy][cz].setBlock(x, y, z, BlockType.GRASS);
+                                } else {
+                                    chunks[cx][cy][cz].setBlock(x, y, z, BlockType.AIR);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -59,51 +80,87 @@ public class World {
     public int getOriginZ() { return originZ; }
 
     /**
-     * ワールドの更新ロジックを実行します。
-     */
-    public void update() {
-        for (int x = 0; x < blocks.length; x++) {
-            for (int y = 0; y < blocks[0].length; y++) {
-                for (int z = 0; z < blocks[0][0].length; z++) {
-                    blocks[x][y][z].update();
-                }
-            }
-        }
-    }
-
-    /**
      * ワールドの描画ロジックを実行します。
      */
     public void render() {
         sky.render();
-        for (int x = 0; x < blocks.length; x++) {
-            for (int y = 0; y < blocks[0].length; y++) {
-                for (int z = 0; z < blocks[0][0].length; z++) {
-                    if (!blocks[x][y][z].isAir()) {
-                        blocks[x][y][z].render();
-                    }
+        
+        for (int cx = 0; cx < chunksX; cx++) {
+            for (int cy = 0; cy < chunksY; cy++) {
+                for (int cz = 0; cz < chunksZ; cz++) {
+                    chunks[cx][cy][cz].render();
                 }
             }
         }
-    }
-
-    public Block[][][] getBlocks() {
-        return blocks;
     }
 
     public List<Mob> getMobs() {
         return mobs;
     }
 
-    public Block getBlockAt(float x, float y, float z) {
-        return blocks[toBlockX(x)][toBlockY(y)][toBlockZ(z)];
+    /**
+     * Chunk 配列を取得
+     */
+    public Chunk[][][] getChunks() {
+        return chunks;
     }
 
-    public void replaceBlock(Block block) {
-        int x = (int) toBlockX(block.getX());
-        int y = (int) toBlockY(block.getY());
-        int z = (int) toBlockZ(block.getZ());
-        blocks[x][y][z] = block;
+    /**
+     * ワールド座標から Chunk を取得
+     */
+    public Chunk getChunkAt(int worldX, int worldY, int worldZ) {
+        // ワールド座標からチャンク配列インデックスを計算
+        // Math.floorDiv を使用して負の座標も正しく処理
+        int cx = Math.floorDiv(worldX - originX, Chunk.CHUNK_SIZE);
+        int cy = Math.floorDiv(worldY - originY, Chunk.CHUNK_SIZE);
+        int cz = Math.floorDiv(worldZ - originZ, Chunk.CHUNK_SIZE);
+        
+        if (cx >= 0 && cx < chunksX && cy >= 0 && cy < chunksY && cz >= 0 && cz < chunksZ) {
+            return chunks[cx][cy][cz];
+        }
+        return null;
+    }
+
+    /**
+     * ワールド座標のブロックタイプを取得（Chunk ベース）
+     */
+    public BlockType getBlockTypeAt(int worldX, int worldY, int worldZ) {
+        Chunk chunk = getChunkAt(worldX, worldY, worldZ);
+        if (chunk != null) {
+            int localX = worldX - chunk.getChunkX();
+            int localY = worldY - chunk.getChunkY();
+            int localZ = worldZ - chunk.getChunkZ();
+            return chunk.getBlock(localX, localY, localZ);
+        }
+        return BlockType.AIR;
+    }
+
+    /**
+     * ワールド座標のブロックタイプを設定（Chunk ベース）
+     */
+    public void setBlockTypeAt(int worldX, int worldY, int worldZ, BlockType blockType) {
+        Chunk chunk = getChunkAt(worldX, worldY, worldZ);
+        if (chunk != null) {
+            int localX = worldX - chunk.getChunkX();
+            int localY = worldY - chunk.getChunkY();
+            int localZ = worldZ - chunk.getChunkZ();
+            chunk.setBlock(localX, localY, localZ, blockType);
+        }
+    }
+
+    /**
+     * ワールド座標からBlockオブジェクトを取得（Chunkベース）
+     */
+    public Block getBlockAt(int worldX, int worldY, int worldZ) {
+        Chunk chunk = getChunkAt(worldX, worldY, worldZ);
+        if (chunk != null) {
+            int localX = worldX - chunk.getChunkX();
+            int localY = worldY - chunk.getChunkY();
+            int localZ = worldZ - chunk.getChunkZ();
+            return chunk.getBlockObject(localX, localY, localZ);
+        }
+        // 範囲外の場合は空気ブロックを返す
+        return new Block(this, "空気ブロック", "air", worldX, worldY, worldZ, 1, 1, 1);
     }
 
     public int toBlockX(float x) {

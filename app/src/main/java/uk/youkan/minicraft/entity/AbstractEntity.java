@@ -105,25 +105,20 @@ public abstract class AbstractEntity implements Entity {
     public boolean checkCollisionWithBlocks(float newX, float newY, float newZ) {
         if (world == null) return false;
 
-        int blockX = world.toBlockX(newX);
-        int blockY = world.toBlockY(newY);
-        int blockZ = world.toBlockZ(newZ);
+        int blockX = (int) Math.floor(newX);
+        int blockY = (int) Math.floor(newY);
+        int blockZ = (int) Math.floor(newZ);
 
-        if (blockX >= 0 && blockX < world.getWidth() &&
-            blockY >= 0 && blockY < world.getHeight() &&
-            blockZ >= 0 && blockZ < world.getDepth()) {
-
-            Block targetBlock = world.getBlocks()[blockX][blockY][blockZ];
-            if (!targetBlock.isAir()) {
-                if (boxCollider.wouldIntersectAt(newX, newY, newZ, targetBlock.getBoxCollider())) {
-                    if (newY < transform.getY()) {
-                        onGround = true;
-                        if (physics != null) {
-                            physics.setOnGround(true);
-                        }
+        Block targetBlock = world.getBlockAt(blockX, blockY, blockZ);
+        if (!targetBlock.isAir()) {
+            if (boxCollider.wouldIntersectAt(newX, newY, newZ, targetBlock.getBoxCollider())) {
+                if (newY < transform.getY()) {
+                    onGround = true;
+                    if (physics != null) {
+                        physics.setOnGround(true);
                     }
-                    return true;
                 }
+                return true;
             }
         }
 

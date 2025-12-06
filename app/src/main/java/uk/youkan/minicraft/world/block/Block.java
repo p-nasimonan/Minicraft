@@ -31,12 +31,9 @@ public class Block extends Item {
 
         glCullFace(GL_BACK);
 
-        // ブロックの色を設定
-        switch (id) {
-            case "grass" -> glColor3f(0.0f, 0.5f, 0.0f);
-            case "stone" -> glColor3f(0.3f, 0.3f, 0.3f);
-            default -> glColor3f(1.0f, 1.0f, 1.0f);
-        }
+        // ブロックの色を設定（BoxRenderer の色を使用）
+        float[] rendererColor = renderer.getColor();
+        glColor3f(rendererColor[0], rendererColor[1], rendererColor[2]);
 
         // 面を描画(触れていない面のみ)
         glBegin(GL_QUADS);

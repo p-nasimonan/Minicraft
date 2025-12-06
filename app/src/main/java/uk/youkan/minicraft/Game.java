@@ -174,8 +174,6 @@ public class Game {
         inputManager.update();
         handleInput();
         if (gameStarted) {
-            world.update();
-
             if (!cursorEnabled) {
                 player.update();
                 player.handleInput();

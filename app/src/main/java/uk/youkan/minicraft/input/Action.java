@@ -2,7 +2,7 @@ package uk.youkan.minicraft.input;
 
 import uk.youkan.minicraft.entity.Mob;
 import uk.youkan.minicraft.world.World;
-import uk.youkan.minicraft.world.block.Block;
+import uk.youkan.minicraft.world.block.BlockType;
 
 /**
  * ゲーム内のキャラクターの行動を定義するクラス
@@ -95,7 +95,7 @@ public class Action {
      * プレイヤーの向いている方向にブロックを設置します
      * @param pitch プレイヤーの向いている方向（度数）
      * @param yaw プレイヤーの向いている方向（度数）
-     * @param blockId ブロックのID
+     * @param blockId ブロックのID（"stone", "grass", "air" など）
      */
     public void replaceBlockInDirection(float pitch, float yaw, String blockId) {
         float playerX = actor.getX();
@@ -114,7 +114,8 @@ public class Action {
         int blockY = (int) (playerY + forwardY);
         int blockZ = (int) (playerZ + forwardZ);
 
-        Block block = new Block(world, "block", blockId, blockX, blockY, blockZ, 1, 1, 1);
-        this.world.replaceBlock(block);
+        // BlockType を使用して Chunk システムに反映
+        BlockType blockType = BlockType.fromStringId(blockId);
+        world.setBlockTypeAt(blockX, blockY, blockZ, blockType);
     }
 }
