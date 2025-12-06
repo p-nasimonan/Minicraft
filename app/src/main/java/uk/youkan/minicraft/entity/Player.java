@@ -5,7 +5,6 @@ import uk.youkan.minicraft.input.Action;
 import uk.youkan.minicraft.input.Camera;
 import uk.youkan.minicraft.input.MouseInput;
 import uk.youkan.minicraft.item.Item;
-import uk.youkan.minicraft.physics.Collider;
 import uk.youkan.minicraft.ui.InputHandler;
 import uk.youkan.minicraft.world.World;
 
@@ -37,18 +36,13 @@ public class Player extends Mob {
         super(world, "player", "Player", 10, x, y, z, 100, 1, 4, 1);
         this.world = world;
         inventory = new Item[36];
-        this.x = x;
-        this.y = y;
-        this.z = z;
 
         this.pitch = 0.0f;
         this.yaw = 0.0f;
         this.mode = "survival";
 
-        this.collider = new Collider(x, y, z, width, height, depth);
-
         this.camera = new Camera();
-        camera.setPosition(x, y, z);
+        camera.setPosition(getX(), getY(), getZ());
         this.mouseInput = inputHandler.getMouseInput();
         this.action = new Action(this, world);
     }
@@ -98,7 +92,7 @@ public class Player extends Mob {
     public void setCamera() {
         glRotatef(pitch, 1.0f, 0.0f, 0.0f);
         glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-        glTranslatef(-x, -(y + eyeY), -z);
+        glTranslatef(-getX(), -(getY() + eyeY), -getZ());
     }
 
     /**
@@ -125,7 +119,7 @@ public class Player extends Mob {
     }
 
     private void updateCamera() {
-        camera.setPosition(x, y, z);
+        camera.setPosition(getX(), getY(), getZ());
         camera.setRotation(pitch, yaw);
     }
 
@@ -134,8 +128,8 @@ public class Player extends Mob {
         super.debugInfo();
         System.out.println("Player Specific Info:");
         System.out.println("  Mode: " + mode);
-        System.out.println("  OnGround: " + onGround);
-        System.out.println("  Vertical Velocity: " + vy);
+        System.out.println("  OnGround: " + isOnGround());
+        System.out.println("  Vertical Velocity: " + getVy());
         System.out.println("  Camera Rotation: (pitch: " + pitch + ", yaw: " + yaw + ")");
     }
 

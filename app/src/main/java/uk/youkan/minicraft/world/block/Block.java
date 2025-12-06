@@ -1,5 +1,6 @@
 package uk.youkan.minicraft.world.block;
 
+import uk.youkan.minicraft.entity.component.BoxCollider;
 import uk.youkan.minicraft.item.Item;
 import uk.youkan.minicraft.world.World;
 
@@ -16,6 +17,14 @@ public class Block extends Item {
 
     public boolean isAir() {
         return this.id.equals("air");
+    }
+
+    /**
+     * コンポーネントベースのBoxColliderを取得
+     */
+    @Override
+    public BoxCollider getBoxCollider() {
+        return super.getBoxCollider();
     }
 
     @Override

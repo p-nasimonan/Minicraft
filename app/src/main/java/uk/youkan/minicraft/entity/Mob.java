@@ -1,7 +1,6 @@
 package uk.youkan.minicraft.entity;
 
 import uk.youkan.minicraft.input.Action;
-import uk.youkan.minicraft.physics.Collider;
 import uk.youkan.minicraft.world.World;
 
 /**
@@ -20,7 +19,6 @@ public abstract class Mob extends AbstractEntity implements MobBehavior {
         this.hp = hp;
         this.maxHp = hp;
         this.action = new Action(this, world);
-        this.collider = new Collider(x, y, z, width, height, depth);
     }
 
     @Override
@@ -44,9 +42,26 @@ public abstract class Mob extends AbstractEntity implements MobBehavior {
     
     public int getMaxHp() { return maxHp; }
     
-    // Action用のアクセサメソッド
-    public boolean isOnGround() { return onGround; }
-    public void setOnGround(boolean onGround) { this.onGround = onGround; }
-    public float getVy() { return vy; }
-    public void setVy(float vy) { this.vy = vy; }
+    // Action用のアクセサメソッド（Physicsコンポーネントへデリゲート）
+    public boolean isOnGround() { 
+        return physics != null ? physics.isOnGround() : onGround; 
+    }
+    
+    public void setOnGround(boolean onGround) { 
+        this.onGround = onGround;
+        if (physics != null) {
+            physics.setOnGround(onGround);
+        }
+    }
+    
+    public float getVy() { 
+        return physics != null ? physics.getVy() : vy; 
+    }
+    
+    public void setVy(float vy) { 
+        this.vy = vy;
+        if (physics != null) {
+            physics.setVy(vy);
+        }
+    }
 }
