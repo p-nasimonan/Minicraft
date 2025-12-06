@@ -1,5 +1,5 @@
 // プロジェクトのバージョン
-val version = "1.01"
+val version = "1.02"
 
 
 plugins {
@@ -100,11 +100,23 @@ java {
 application {
     // Define the main class for the application.
     mainClass.set("uk.youkan.minicraft.Main")
-    applicationDefaultJvmArgs = if (System.getProperty("os.name").lowercase().contains("mac")) {
-        listOf("-XstartOnFirstThread")
-    } else {
-        listOf()
+    
+    val jvmArgs = mutableListOf(
+        "-XX:+IgnoreUnrecognizedVMOptions",
+        "--enable-preview",
+        "--add-modules", "java.base",
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+        "--add-opens", "java.base/sun.nio=ALL-UNNAMED",
+        "-XX:+UnlockDiagnosticVMOptions",
+        "-XX:+SuppressErrorEncountered"
+    )
+    
+    if (System.getProperty("os.name").lowercase().contains("mac")) {
+        jvmArgs.add(0, "-XstartOnFirstThread")
     }
+    
+    applicationDefaultJvmArgs = jvmArgs
 }
 
 // runタスクにシステムプロパティを追加
@@ -157,6 +169,7 @@ tasks.jar {
 tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "uk.youkan.minicraft.Main"
+        attributes["Add-Opens"] = "java.base/java.lang java.base/java.util java.base/sun.nio"
     }
 }
 
@@ -169,7 +182,36 @@ tasks.register<Jar>("fatJar") {
     }
     from(sourceSets.main.get().output)
     dependsOn(configurations.runtimeClasspath)
+    
+    // すべてのOS対応ネイティブライブラリを含める
+    val allNatives = listOf(
+        "natives-windows",
+        "natives-linux",
+        "natives-macos",
+        "natives-macos-arm64"
+    )
+    
+    val lwjglLibs = listOf(
+        "lwjgl",
+        "lwjgl-assimp",
+        "lwjgl-glfw",
+        "lwjgl-openal",
+        "lwjgl-opengl",
+        "lwjgl-stb"
+    )
+    
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    
+    // すべてのOS用ネイティブライブラリを追加
+    for (nativeId in allNatives) {
+        for (libName in lwjglLibs) {
+            val depString = "org.lwjgl:$libName:$lwjglVersion:$nativeId"
+            val nativeFiles = configurations.detachedConfiguration(
+                dependencies.create(depString)
+            )
+            from(nativeFiles.map { if (it.isDirectory) it else zipTree(it) })
+        }
+    }
 
     // 重複処理戦略を設定
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

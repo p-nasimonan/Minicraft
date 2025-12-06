@@ -28,7 +28,7 @@ public class Game {
     private int fps;
     private int frames;
     // システムプロパティ "debug" で制御可能 (java -Ddebug=true)
-    private boolean debugMode = "true".equalsIgnoreCase(System.getProperty("debug", "true"));
+    private boolean debugMode = "true".equalsIgnoreCase(System.getProperty("debug", "false"));
 
     /**
      * ゲームを開始します
