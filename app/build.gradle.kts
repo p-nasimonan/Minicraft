@@ -99,7 +99,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass.set("jp.ac.uryukyu.ie.e245719.Main")
+    mainClass.set("uk.youkan.minicraft.Main")
     applicationDefaultJvmArgs = if (System.getProperty("os.name").lowercase().contains("mac")) {
         listOf("-XstartOnFirstThread")
     } else {
@@ -141,7 +141,7 @@ tasks.jar {
     archiveBaseName.set("minicraft") // JARファイルの基本名を設定
     archiveVersion.set(version) // バージョンを設定
     manifest {
-        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main" // メインクラスを指定
+        attributes["Main-Class"] = "uk.youkan.minicraft.Main" // メインクラスを指定
     }
     from({
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
@@ -151,7 +151,7 @@ tasks.jar {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main"
+        attributes["Main-Class"] = "uk.youkan.minicraft.Main"
     }
 }
 
@@ -160,7 +160,7 @@ tasks.register<Jar>("fatJar") {
     archiveBaseName.set("minicraft")
     archiveVersion.set(version)
     manifest {
-        attributes["Main-Class"] = "jp.ac.uryukyu.ie.e245719.Main"
+        attributes["Main-Class"] = "uk.youkan.minicraft.Main"
     }
     from(sourceSets.main.get().output)
     dependsOn(configurations.runtimeClasspath)
